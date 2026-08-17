@@ -16,7 +16,7 @@ export class HomePage extends Page {
   setAttributes() {
     this.pageWrapper.classList.add("home-page-container");
     
-    this.title.classList.add("h1");
+    this.title.classList.add("title");
     this.title.textContent = "Tic-Tac-Toe";
     
     this.startButton.classList.add("start-button");
