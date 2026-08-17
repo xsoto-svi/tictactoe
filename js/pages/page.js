@@ -1,5 +1,8 @@
-export class Page {
+import { ViewTemplate } from "../core/viewTemplate";
+
+export class Page extends ViewTemplate {
   constructor(container) {
+    super();
     this.container = container;
   }
 
