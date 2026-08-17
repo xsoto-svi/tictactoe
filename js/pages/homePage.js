@@ -4,10 +4,6 @@ export class HomePage extends Page {
   constructor(container) {
     super();
     this.container = container;
-    
-    this.initializeElements();
-    this.setAttributes();
-    this.appendElements();
   }
 
   initializeElements() {
