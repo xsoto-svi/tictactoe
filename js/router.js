@@ -1,5 +1,5 @@
 export class Router {
-  constructor(container, routes = {}, protectedPaths = []) {
+  constructor(container, routes = {}) {
     this.container = container;
     this.routes = routes;
 
