@@ -1,4 +1,4 @@
-import { ViewTemplate } from "../core/viewTemplate";
+import { ViewTemplate } from "../core/viewTemplate.js";
 
 export class Page extends ViewTemplate {
   constructor(container) {
