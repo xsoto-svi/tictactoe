@@ -14,15 +14,15 @@ export class HomePage extends Page {
   }
 
   setAttributes() {
-    this.pageWrapper.classList.add("home-page-container");
+    this.pageWrapper.classList.add("page-container");
     
     this.title.classList.add("title");
     this.title.textContent = "Tic-Tac-Toe";
     
-    this.startButton.classList.add("start-button");
+    this.startButton.classList.add("btn-start");
     this.startButton.textContent = "Start";
 
-    this.howToPlayButton.classList.add("how-to-play-button");
+    this.howToPlayButton.classList.add("btn-how-to-play");
     this.howToPlayButton.textContent = "How To Play";
   }
 
