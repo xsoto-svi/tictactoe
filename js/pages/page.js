@@ -4,6 +4,6 @@ export class Page {
   }
 
   render() {
-    throw new Error("render() must be implemente");
+    throw new Error("render() must be implemented");
   }
 }
