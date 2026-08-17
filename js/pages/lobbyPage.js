@@ -1,13 +1,9 @@
 import { Page } from "./page.js"
 
-export class LobbyOptionsPage extends Page {
+export class LobbyPage extends Page {
   constructor(container) {
     super();
     this.container = container;
-    
-    this.initializeElements();
-    this.setAttributes();
-    this.appendElements();
   }
 
   initializeElements() {
@@ -31,13 +27,19 @@ export class LobbyOptionsPage extends Page {
     
     this.createGameContainer.classList.add("option-container");
     this.createGameHeading.classList.add("option-heading");
+    this.createGameHeading.textContent = "Create Game";
     this.createGameDescription.classList.add("description");
+    this.createGameDescription.textContent = "Create Game Description";
     this.createGameButton.classList.add("btn-create");
+    this.createGameButton.textContent = "Create";
 
     this.joinGameContainer.classList.add("option-container");
     this.joinGameHeading.classList.add("option-heading");
+    this.joinGameHeading.textContent = "Join Game";
     this.joinGameDescription.classList.add("description");
+    this.joinGameDescription.textContent = "Join Game Description";
     this.joinGameButton.classList.add("btn-join");
+    this.joinGameButton.textContent = "Join";
   }
 
   appendElements() {
