@@ -1,12 +1,15 @@
 import { Page } from "./page.js"
 
 export class LobbyPage extends Page {
-  constructor(appContainer) {
+  constructor(appContainer, router) {
     super(appContainer);
+
+    this.router = router;
 
     this.initializeElements();
     this.setAttributes();
     this.appendElements();
+    this.attachEvents();
   }
 
   initializeElements() {
@@ -22,11 +25,12 @@ export class LobbyPage extends Page {
     this.joinGameHeading = document.createElement("h2");
     this.joinGameDescription = document.createElement("p");
     this.joinGameButton = document.createElement("button");
+
+    this.backButton = document.createElement("button");
   }
 
   setAttributes() {
     this.pageWrapper.classList.add("page-container");
-    this.title = document.createElement("title");
     
     this.createGameContainer.classList.add("option-container");
     this.createGameHeading.classList.add("option-heading");
@@ -43,6 +47,9 @@ export class LobbyPage extends Page {
     this.joinGameDescription.textContent = "Join Game Description";
     this.joinGameButton.classList.add("btn-join");
     this.joinGameButton.textContent = "Join";
+
+    this.backButton.classList.add("back-button");
+    this.backButton.textContent = "Back";
   }
 
   appendElements() {
@@ -50,6 +57,12 @@ export class LobbyPage extends Page {
 
     this.joinGameContainer.append(this.joinGameHeading, this.joinGameDescription, this.joinGameButton);
 
-    this.pageWrapper.append(this.title, this.createGameContainer, this.joinGameContainer);
+    this.pageWrapper.append(this.title, this.createGameContainer, this.joinGameContainer, this.backButton);
+  }
+
+  attachEvents() {
+    this.backButton.addEventListener("click", () => {
+      this.router.navigate("/");
+    });
   }
 }
