@@ -1,10 +1,11 @@
-import { Page } from "./page.js"
+import { Page } from "./page.js";
 
 export class LobbyPage extends Page {
-  constructor(appContainer, router) {
+  constructor(appContainer, router, tictactoeApi) {
     super(appContainer);
 
     this.router = router;
+    this.tictactoeApi = tictactoeApi;
 
     this.initializeElements();
     this.setAttributes();
@@ -64,5 +65,15 @@ export class LobbyPage extends Page {
     this.backButton.addEventListener("click", () => {
       this.router.navigate("/");
     });
+
+    this.createGameButton.addEventListener("click", () => {
+      this.tictactoeApi.createGame()
+    })
+  }
+
+  generateRoomCode() {
+    const roomCode = Math.random().toString(36).substring(2, 6);
+
+    
   }
 }
