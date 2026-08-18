@@ -1,12 +1,14 @@
 import { Page } from "./page.js"
 
 export class HomePage extends Page {
-  constructor(appContainer) {
+  constructor(appContainer, router) {
     super(appContainer);
+    this.router = router;
 
     this.initializeElements();
     this.setAttributes();
     this.appendElements();
+    this.attachEvents();
   }
 
   initializeElements() {
@@ -30,5 +32,15 @@ export class HomePage extends Page {
     this.pageWrapper.append(this.title);
     this.pageWrapper.append(this.startButton);
     this.pageWrapper.append(this.howToPlayButton);
+  }
+
+  attachEvents() {
+    this.startButton.addEventListener("click", () => {
+      this.router.navigate("/lobby");
+    });
+
+    this.howToPlayButton.addEventListener("click", () => {
+      this.router.navigate("/how-to-play");
+    });
   }
 }
