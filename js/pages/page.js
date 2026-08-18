@@ -1,12 +1,17 @@
 import { ViewTemplate } from "../core/viewTemplate.js";
 
 export class Page extends ViewTemplate {
-  constructor(container) {
+  constructor(appContainer) {
     super();
-    this.container = container;
+    this.appContainer = appContainer;
+    this.pageWrapper = document.createElement("div");
+  }
+
+  setAttributes() {
+    this.pageWrapper.classList.add("page-container");
   }
 
   render() {
-    throw new Error("render() must be implemented");
+    this.appContainer.append(this.pageWrapper);
   }
 }

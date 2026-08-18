@@ -1,9 +1,12 @@
 import { Page } from "./page.js"
 
 export class LobbyPage extends Page {
-  constructor(container) {
-    super();
-    this.container = container;
+  constructor(appContainer) {
+    super(appContainer);
+
+    this.initializeElements();
+    this.setAttributes();
+    this.appendElements();
   }
 
   initializeElements() {
@@ -48,9 +51,5 @@ export class LobbyPage extends Page {
     this.joinGameContainer.append(this.joinGameHeading, this.joinGameDescription, this.joinGameButton);
 
     this.pageWrapper.append(this.title, this.createGameContainer, this.joinGameContainer);
-  }
-
-  render() {
-    this.container.append(this.pageWrapper);
   }
 }

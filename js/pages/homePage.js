@@ -1,21 +1,21 @@
 import { Page } from "./page.js"
 
 export class HomePage extends Page {
-  constructor(container) {
-    super();
-    this.container = container;
+  constructor(appContainer) {
+    super(appContainer);
+
+    this.initializeElements();
+    this.setAttributes();
+    this.appendElements();
   }
 
   initializeElements() {
-    this.pageWrapper = document.createElement("div");
     this.title = document.createElement("h1");
     this.startButton = document.createElement("button");
     this.howToPlayButton = document.createElement("button");
   }
 
   setAttributes() {
-    this.pageWrapper.classList.add("page-container");
-    
     this.title.classList.add("title");
     this.title.textContent = "Tic-Tac-Toe";
     
@@ -30,9 +30,5 @@ export class HomePage extends Page {
     this.pageWrapper.append(this.title);
     this.pageWrapper.append(this.startButton);
     this.pageWrapper.append(this.howToPlayButton);
-  }
-
-  render() {
-    this.container.append(this.pageWrapper);
   }
 }

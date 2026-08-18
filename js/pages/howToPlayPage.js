@@ -1,9 +1,12 @@
 import { Page } from "./page.js"
 
 export class HowToPlayPage extends Page {
-  constructor(container) {
-    super();
-    this.container = container;
+  constructor(appContainer) {
+    super(appContainer);
+
+    this.initializeElements();
+    this.setAttributes();
+    this.appendElements();
   }
 
   initializeElements() {
@@ -28,9 +31,5 @@ export class HowToPlayPage extends Page {
 
   appendElements() {
     this.pageWrapper.append(this.title, this.instructions, this.okButton);
-  }
-
-  render() {
-    this.container.append(this.pageWrapper);
   }
 }
