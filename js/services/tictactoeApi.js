@@ -1,6 +1,6 @@
 import { ApiClient } from "./apiClient.js";
 
-export class tictactoeApi extends ApiClient {
+export class TicTacToeApi extends ApiClient {
   constructor() {
     super("http://localhost:8080/tictactoe/tictactoeserver");
   }
