@@ -1,6 +1,6 @@
 export class Router {
-  constructor(container, routes = {}) {
-    this.container = container;
+  constructor(appContainer, routes = {}) {
+    this.appContainer = appContainer;
     this.routes = routes;
 
     this.load();
@@ -15,7 +15,7 @@ export class Router {
   }
 
   load() {
-    this.container.replaceChildren();
+    this.appContainer.replaceChildren();
 
     const path = window.location.hash.slice(1) || "/";
 
@@ -26,7 +26,7 @@ export class Router {
       return;
     }
 
-    const page = new PageClass(this.container, this);
+    const page = new PageClass(this.appContainer, this);
 
     page.render();
   }
