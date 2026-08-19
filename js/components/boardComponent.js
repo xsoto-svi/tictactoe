@@ -1,5 +1,5 @@
 import { CellComponent } from "./cellComponent.js";
-import { Component } from "./component.js";
+import { Component } from "./core/component.js";
 
 export class BoardComponent extends Component {
   constructor(onCellClick) {
