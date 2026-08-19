@@ -1,3 +1,4 @@
+import { GameState } from "./game/gameState.js";
 import { GamePage } from "./pages/gamePage.js";
 import { HomePage } from "./pages/homePage.js";
 import { HowToPlayPage } from "./pages/howToPlayPage.js";
@@ -8,6 +9,7 @@ import { TicTacToeApi } from "./services/tictactoeApi.js";
 
 const appContainer = document.querySelector("#app");
 const tictactoeApi = new TicTacToeApi();
+const gameState = new GameState();
 
 const routes = {
   "/": HomePage,
@@ -17,4 +19,4 @@ const routes = {
   "/game": GamePage
 }
 
-const router = new Router(appContainer, routes, tictactoeApi);
+const router = new Router(appContainer, routes, tictactoeApi, gameState);
