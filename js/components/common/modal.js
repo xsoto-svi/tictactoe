@@ -2,7 +2,8 @@ import { Component } from "../core/component.js";
 
 export class Modal extends Component {
   constructor(container, titleText, contentElement, isDismissible = true) {
-    super(container);
+    super();
+    this.container = container;
     this.titleText = titleText;
     this.contentElement = contentElement;
     this.isDismissible = isDismissible;
@@ -41,9 +42,7 @@ export class Modal extends Component {
   }
 
   open() {
-    const modalDOM = this.getHTML();
-
-    this.container.append(modalDOM);
+    this.container.append(this.modalWrapper);
 
     this.attachEvents();
   }

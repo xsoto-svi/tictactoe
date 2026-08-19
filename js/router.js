@@ -1,7 +1,9 @@
 export class Router {
-  constructor(appContainer, routes = {}) {
+  constructor(appContainer, routes = {}, tictactoeApi, gameState) {
     this.appContainer = appContainer;
     this.routes = routes;
+    this.tictactoeApi = tictactoeApi;
+    this.gameState = gameState;
 
     this.load();
 
@@ -26,7 +28,7 @@ export class Router {
       return;
     }
 
-    const page = new PageClass(this.appContainer, this);
+    const page = new PageClass(this.appContainer, this, this.tictactoeApi, this.gameState);
 
     page.render();
   }
@@ -38,6 +40,6 @@ export class Router {
     let para = document.createElement("p");
     para.append("Page not found");
 
-    this.container.append(header, para);
+    this.appContainer.append(header, para);
   }
 }
