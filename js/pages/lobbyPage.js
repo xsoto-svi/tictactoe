@@ -38,7 +38,7 @@ export class LobbyPage extends Page {
 
   setAttributes() {
     this.pageWrapper.classList.add("page-container");
-    
+
     this.createGameContainer.classList.add("option-container");
     this.createGameHeading.classList.add("option-heading");
     this.createGameHeading.textContent = "Create Game";
@@ -66,7 +66,7 @@ export class LobbyPage extends Page {
     this.createGameContainer.append(
       this.createGameHeading,
       this.createGameDescription,
-      this.createGameButton
+      this.createGameButton,
     );
 
     this.joinGameContainer.append(
@@ -74,14 +74,14 @@ export class LobbyPage extends Page {
       this.joinGameDescription,
       this.joinGameLabel,
       this.joinGameTextbox,
-      this.joinGameButton
+      this.joinGameButton,
     );
 
     this.pageWrapper.append(
       this.title,
       this.createGameContainer,
       this.joinGameContainer,
-      this.backButton
+      this.backButton,
     );
   }
 
@@ -91,8 +91,12 @@ export class LobbyPage extends Page {
     });
 
     this.createGameButton.addEventListener("click", async () => {
-      const roomCode = Math.random().toString(36).substring(2, 6);
-      this.showLoadingModal("Room Created", `Waiting for opponent... Code: ${roomCode}`);
+      // const roomCode = Math.random().toString(36).substring(2, 6);
+      const roomCode = "test";
+      Modal.showLoadingModal(
+        "Room Created",
+        `Waiting for opponent... Code: ${roomCode}`,
+      );
 
       try {
         const symbol = await this.tictactoeApi.createGame(roomCode);
@@ -103,13 +107,15 @@ export class LobbyPage extends Page {
           if (isReady == "true") {
             clearInterval(checkInterval);
             this.gameState.status = "playing";
-            this.closeModal();
+            Modal.closeModal();
             this.router.navigate("/game");
           }
         }, 1500);
-
       } catch (error) {
-        this.showAlertModal("Network Error", "Could not create the game on the server.");
+        Modal.showAlertModal(
+          "Network Error",
+          "Could not create the game on the server.",
+        );
       }
     });
 
@@ -123,11 +129,14 @@ export class LobbyPage extends Page {
       const enteredCode = this.joinGameTextbox.value.replace(/\s/g, "");
 
       if (enteredCode.length !== 4) {
-        this.showAlertModal("Invalid Input", "Please enter a valid 4-character code.");
+        Modal.showAlertModal(
+          "Invalid Input",
+          "Please enter a valid 4-character code.",
+        );
         return;
       }
 
-      this.showLoadingModal("Joining...", "Connecting to room...");
+      Modal.showLoadingModal("Joining...", "Connecting to room...");
 
       try {
         const symbol = await this.tictactoeApi.createGame(enteredCode);
@@ -135,44 +144,24 @@ export class LobbyPage extends Page {
         if (symbol === "X") {
           // If we got "X", the room didn't exist and the server just made a new one
           this.tictactoeApi.resetGame(enteredCode);
-          this.showAlertModal("Room Not Found", "Please check the code and try again.");
-          
+          Modal.showAlertModal(
+            "Room Not Found",
+            "Please check the code and try again.",
+          );
         } else if (symbol === "O") {
           this.gameState.joinRoom(enteredCode, "O");
           this.gameState.status = "playing";
-          this.closeModal();
+          Modal.closeModal();
           this.router.navigate("/game");
         } else {
-          this.showAlertModal("Unable to Join", symbol);
+          Modal.showAlertModal("Unable to Join", symbol);
         }
       } catch (error) {
-        this.showAlertModal("Network Error", "Could not connect to the server.");
+        Modal.showAlertModal(
+          "Network Error",
+          "Could not connect to the server.",
+        );
       }
     });
-  }
-
-  showLoadingModal(title, message) {
-    this.closeModal();
-    const messageElement = document.createElement("p");
-    messageElement.textContent = message;
-
-    this.currentModal = new Modal(document.body, title, messageElement, false);
-    this.currentModal.open();
-  }
-
-  showAlertModal(title, message) {
-    this.closeModal(); 
-    const messageElement = document.createElement("p");
-    messageElement.textContent = message;
-
-    this.currentModal = new Modal(document.body, title, messageElement, true);
-    this.currentModal.open();
-  }
-
-  closeModal() {
-    if (this.currentModal) {
-      this.currentModal.close();
-      this.currentModal = null;
-    }
   }
 }
