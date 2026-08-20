@@ -52,4 +52,29 @@ export class Modal extends Component {
       this.modalWrapper.remove();
     }
   }
+
+  static showLoadingModal(title, message) {
+    this.closeModal();
+    const messageElement = document.createElement("p");
+    messageElement.textContent = message;
+
+    this.currentModal = new Modal(document.body, title, messageElement, false);
+    this.currentModal.open();
+  }
+
+  static showAlertModal(title, message) {
+    this.closeModal(); 
+    const messageElement = document.createElement("p");
+    messageElement.textContent = message;
+
+    this.currentModal = new Modal(document.body, title, messageElement, true);
+    this.currentModal.open();
+  }
+
+  static closeModal() {
+    if (this.currentModal) {
+      this.currentModal.close();
+      this.currentModal = null;
+    }
+  }
 }
