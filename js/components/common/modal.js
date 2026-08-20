@@ -7,7 +7,7 @@ export class Modal extends Component {
     this.titleText = titleText;
     this.contentElement = contentElement;
     this.isDismissible = isDismissible;
-    
+
     this.modalWrapper = null;
 
     this.initializeElements();
@@ -63,7 +63,7 @@ export class Modal extends Component {
   }
 
   static showAlertModal(title, message) {
-    this.closeModal(); 
+    this.closeModal();
     const messageElement = document.createElement("p");
     messageElement.textContent = message;
 
