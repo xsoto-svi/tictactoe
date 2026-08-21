@@ -8,6 +8,7 @@ export class GamePage extends Page {
     this.router = router;
     this.tictactoeApi = tictactoeApi;
     this.gameState = gameState;
+    this.isProcessingMove = false;
 
     this.gameBoard = new BoardComponent((index) => this.onCellClick(index));
 
@@ -19,20 +20,29 @@ export class GamePage extends Page {
 
   initializeElements() {
     this.title = document.createElement("h1");
-    this.turnContainer = document.createElement("div");
+    this.gameStatusBar = document.createElement("div");
+    this.gameStatusText = document.createElement("p");
+
+    this.errorStatusBar = document.createElement("div");
+    this.errorStatusBarText = document.createElement("p");
   }
 
   setAttributes() {
     this.title.classList.add("title");
+    this.title.textContent = "Tic-Tac-Toe";
     
-    if (isMyTurn) {
-
-    }
-    this.turnContainer.textContent = ;
+    this.gameStatusBar.classList.add("status-bar");
+    this.errorStatusBar.classList.add("error-bar")
+    this.errorStatusBarText.textContent = ""
   }
 
   appendElements() {
-    this.pageWrapper.append(this.title, this.gameBoard.getHTML());
+    this.pageWrapper.append(
+      this.title,
+      this.gameStatusBar,
+      this.errorStatusBar,
+      this.gameBoard.getHTML(),
+    );
   }
 
   attachEvents() {
@@ -56,42 +66,83 @@ export class GamePage extends Page {
           clearInterval(boardInterval);
           Modal.showAlertModal("Game Over", "Your opponent left the game.");
           this.router.navigate("/");
-        } else {
-          this.gameState.syncWithServer(boardData);
+          return;
         }
+
+        this.gameState.syncWithServer(boardData);
+        this.updateUI();
+
       } catch (error) {
+        console.log("error:", error);
         clearInterval(boardInterval);
         Modal.showAlertModal("Game Disconnected", "The room was closed.");
+        this.tictactoeApi.resetGame(this.gameState.roomCode).catch(() => {
+          console.log("Could not reset game; server is unreachable.");
+        });
         this.router.navigate("/");
       }
-    }, 2000);
+    }, 500);
   }
 
   async onCellClick(index) {
+    if (this.isProcessingMove) return;
     if (this.gameState.status !== "playing") return;
 
     if (!this.gameState.isMyTurn) {
-      Modal.showAlert("Hold on!", "It is not your turn yet.");
+      Modal.showAlertModal("Hold on!", "It is not your turn yet.");
       return;
     }
 
-    // 3. Is the cell already taken on our local copy? (Saves a useless API call)
-    if (this.gameState.board[index] !== ":") {
-      Modal.showAlert("Invalid Move", "That space is already taken!");
+    if (this.gameState.board[index] !== "") {
+      Modal.showAlertModal("Invalid Move", "That space is already taken!");
       return;
     }
 
-    const coords = this.gameState.getApiCoordinates(index);
+    this.isProcessingMove = true;
 
     try {
+      const coords = this.gameState.getApiCoordinates(index);
+
       const response = await this.tictactoeApi.updateToAddMove(
         this.gameState.roomCode,
         this.gameState.symbol,
         coords.x,
         coords.y,
       );
+
+      if (response !== "[TAKEN]") {
+        this.gameState.applyLocalMove(index);
+        this.updateUI();
+      } else {
+        Modal.showAlertModal("Invalid Move", "That space is already taken!");
+      }
+      
     } catch (error) {
-      Modal.showAlert("Network Error", "Failed to send move.");
+      Modal.showAlertModal("Network Error", "Failed to send move.");
+    } finally {
+      this.isProcessingMove = false;
     }
+  }
+
+  updateUI() {
+    if (this.gameState.status === "waiting") {
+      this.gameStatusBar.textContent = "Waiting for opponent...";
+    } else if (this.gameState.status === "playing") {
+      this.gameStatusBar.textContent = this.gameState.isMyTurn 
+        ? "It's your turn" 
+        : "Opponent's turn...";
+    } else if (this.gameState.status === "won") {
+      this.gameStatusBar.textContent = this.gameState.winner === this.gameState.symbol 
+        ? "You Won! 🎉" 
+        : "You Lost!";
+    } else if (this.gameState.status === "draw") {
+      this.gameStatusBar.textContent = "It's a draw!";
+    }
+
+    this.gameState.board.forEach((symbol, index) => {
+      console.log("index: ", index);
+      console.log("symbol: ", symbol);
+      this.gameBoard.updateCell(index, symbol);
+    });
   }
 }

@@ -110,7 +110,7 @@ export class LobbyPage extends Page {
             Modal.closeModal();
             this.router.navigate("/game");
           }
-        }, 1500);
+        }, 500);
       } catch (error) {
         Modal.showAlertModal(
           "Network Error",
