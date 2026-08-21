@@ -1,3 +1,5 @@
+import { AlertModal } from "../components/modals/alertModal.js";
+import { LoadingModal } from "../components/modals/loadingModal.js";
 import { Modal } from "../components/modals/modal.js";
 import { Page } from "./page.js";
 
@@ -93,7 +95,7 @@ export class LobbyPage extends Page {
     this.createGameButton.addEventListener("click", async () => {
       // const roomCode = Math.random().toString(36).substring(2, 6);
       const roomCode = "test";
-      Modal.showLoadingModal(
+      LoadingModal.showLoading(
         "Room Created",
         `Waiting for opponent... Code: ${roomCode}`,
       );
@@ -105,17 +107,15 @@ export class LobbyPage extends Page {
         const checkInterval = setInterval(async () => {
           const isReady = await this.tictactoeApi.checkRoomStatus(roomCode);
           if (isReady == "true") {
+            LoadingModal.hideLoading();
             clearInterval(checkInterval);
             this.gameState.status = "playing";
-            Modal.closeModal();
             this.router.navigate("/game");
           }
         }, 500);
       } catch (error) {
-        Modal.showAlertModal(
-          "Network Error",
-          "Could not create the game on the server.",
-        );
+        const alertModal = new AlertModal("Network Error", "Could not create the game on the server.");
+        alertModal.show();
       }
     });
 
@@ -129,38 +129,37 @@ export class LobbyPage extends Page {
       const enteredCode = this.joinGameTextbox.value.replace(/\s/g, "");
 
       if (enteredCode.length !== 4) {
-        Modal.showAlertModal(
-          "Invalid Input",
-          "Please enter a valid 4-character code.",
-        );
+        const alertModal = new AlertModal("Invalid Input", "Please enter a valid 4-character code.");
+        alertModal.show();
         return;
       }
 
-      Modal.showLoadingModal("Joining...", "Connecting to room...");
+      LoadingModal.showLoading("Joining...", "Connecting to room...");
 
       try {
         const symbol = await this.tictactoeApi.createGame(enteredCode);
 
+        LoadingModal.hideLoading();
+
         if (symbol === "X") {
           // If we got "X", the room didn't exist and the server just made a new one
           this.tictactoeApi.resetGame(enteredCode);
-          Modal.showAlertModal(
-            "Room Not Found",
-            "Please check the code and try again.",
-          );
+          const alertModal = new AlertModal("Room Not Found", "Please check the code and try again.");
+          alertModal.show();
+          
         } else if (symbol === "O") {
           this.gameState.joinRoom(enteredCode, "O");
-          this.gameState.status = "playing";
-          Modal.closeModal();
+          this.gameState.status = "playing";          
           this.router.navigate("/game");
         } else {
-          Modal.showAlertModal("Unable to Join", symbol);
+
+          const alertModal = new AlertModal("Unable to Join", symbol);
+          alertModal.show();
         }
       } catch (error) {
-        Modal.showAlertModal(
-          "Network Error",
-          "Could not connect to the server.",
-        );
+
+        const alertModal = new AlertModal("Network Error", "Could not connect to the server.");
+        alertModal.show();
       }
     });
   }

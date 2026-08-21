@@ -9,8 +9,4 @@ export class Component extends ViewTemplate {
   getHTML() {
     return this.componentContainer;
   }
-
-  attachEvents() {
-    throw new Error("attachEvents method must be implemented");
-  }
 }

@@ -1,5 +1,7 @@
 import { BoardComponent } from "../components/boardComponent.js";
+import { AlertModal } from "../components/modals/alertModal.js";
 import { Modal } from "../components/modals/modal.js";
+import { ResetGameModal } from "../components/modals/resetGameModal.js";
 import { Page } from "./page.js";
 
 export class GamePage extends Page {
@@ -64,18 +66,23 @@ export class GamePage extends Page {
 
         if (boardData === "[GAME NOT YET STARTED]") {
           clearInterval(boardInterval);
-          Modal.showAlertModal("Game Over", "Your opponent left the game.");
+          
+          const alertModal = new AlertModal("Game Over", "Your opponent left the game.");
+          alertModal.open();
+
           this.router.navigate("/");
           return;
         }
 
         this.gameState.syncWithServer(boardData);
-        this.updateUI();
+        this.updateUI(); // BUGFIX: Modal duplication
 
       } catch (error) {
         console.log("error:", error);
         clearInterval(boardInterval);
-        Modal.showAlertModal("Game Disconnected", "The room was closed.");
+        
+        const alertModal = new AlertModal("Game Disconnected", "The room was closed.");
+        alertModal.open();
         this.tictactoeApi.resetGame(this.gameState.roomCode).catch(() => {
           console.log("Could not reset game; server is unreachable.");
         });
@@ -96,12 +103,14 @@ export class GamePage extends Page {
     if (this.gameState.status !== "playing") return;
 
     if (!this.gameState.isMyTurn) {
-      Modal.showAlertModal("Hold on!", "It is not your turn yet.");
+      const alertModal = new AlertModal("Hold on!", "It is not your turn yet.");
+      alertModal.open();
       return;
     }
 
     if (this.gameState.board[index] !== "") {
-      Modal.showAlertModal("Invalid Move", "That space is already taken!");
+      const alertModal = new AlertModal("Invalid Move", "That space is already taken!");
+      alertModal.open();
       return;
     }
 
@@ -121,11 +130,14 @@ export class GamePage extends Page {
         this.gameState.applyLocalMove(index);
         this.updateUI();
       } else {
-        Modal.showAlertModal("Invalid Move", "That space is already taken!");
+        const alertModal = new AlertModal("Invalid Move", "That space is already taken!");
+        alertModal.open();
       }
       
     } catch (error) {
-      Modal.showAlertModal("Network Error", "Failed to send move.");
+      console.log("error = ", error);
+      const alertModal = new AlertModal("Network Error", "Failed to send move.");
+      alertModal.open();
     } finally {
       this.isProcessingMove = false;
     }
@@ -139,6 +151,23 @@ export class GamePage extends Page {
         ? "It's your turn" 
         : "Opponent's turn...";
     } else if (this.gameState.status === "won") {
+
+      const gameOverModal = new ResetGameModal(
+        document.body,
+        false,
+        this.symbol,
+        this.gameState.status,
+        () => {                         
+          this.tictactoeApi.resetGame(this.gameState.roomCode);
+          this.isGameOverModalOpen = false;
+        },
+        () => {
+          this.tictactoeApi.resetGame(this.gameState.roomCode);
+          this.router.navigate("/");
+        }
+      )
+      gameOverModal.open();
+
       this.gameStatusBar.textContent = this.gameState.winner === this.gameState.symbol 
         ? "You Won! 🎉" 
         : "You Lost!";
@@ -147,8 +176,6 @@ export class GamePage extends Page {
     }
 
     this.gameState.board.forEach((symbol, index) => {
-      console.log("index: ", index);
-      console.log("symbol: ", symbol);
       this.gameBoard.updateCell(index, symbol);
     });
   }
