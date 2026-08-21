@@ -1,4 +1,4 @@
-import { Modal } from "../components/common/modal.js";
+import { Modal } from "../components/modals/modal.js";
 import { Page } from "./page.js";
 
 export class LobbyPage extends Page {
