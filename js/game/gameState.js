@@ -22,7 +22,7 @@ export class GameState {
   }
 
   syncWithServer(serverBoardData) {
-    this.board = serverBoardData.split(":");
+    this.board = serverBoardData.split(":").slice(0,9);
     this.evaluateGameStatus();
   }
 
