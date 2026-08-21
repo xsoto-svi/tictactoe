@@ -85,6 +85,13 @@ export class GamePage extends Page {
   }
 
   async onCellClick(index) {
+    console.log("--- CLICK DETECTED ---");
+    console.log("1. isProcessingMove:", this.isProcessingMove);
+    console.log("2. Game Status:", this.gameState.status);
+    console.log("3. My Symbol:", this.gameState.symbol);
+    console.log("4. isMyTurn:", this.gameState.isMyTurn);
+    console.log("5. Cell Content:", `"${this.gameState.board[index]}"`);
+
     if (this.isProcessingMove) return;
     if (this.gameState.status !== "playing") return;
 
