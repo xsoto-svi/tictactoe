@@ -1,0 +1,51 @@
+.page-base {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+}
+
+/* --- FORWARD ANIMATIONS (Entering right, Exiting left) --- */
+.slide-in-right {
+  animation: slideInFromRight 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.slide-out-left {
+  animation: slideOutToLeft 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* --- BACKWARD ANIMATIONS (Entering left, Exiting right) --- */
+.slide-in-left {
+  animation: slideInFromLeft 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.slide-out-right {
+  animation: slideOutToRight 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes slideInFromRight {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}
+
+@keyframes slideOutToLeft {
+  from { transform: translateX(0); }
+  to { transform: translateX(-30%); opacity: 0.5; }
+}
+
+@keyframes slideInFromLeft {
+  from { transform: translateX(-30%); opacity: 0.5; }
+  to { transform: translateX(0); }
+}
+
+@keyframes slideOutToRight {
+  from { transform: translateX(0); }
+  to { transform: translateX(100%); }
+}

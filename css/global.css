@@ -1,0 +1,122 @@
+@import url('./theme.css');
+@import url('./variables.css');
+@import url('./components/board.css');
+@import url('./components/common/modal.css');
+@import url('./pages/page.css');
+@import url('./pages/how-to-play-page.css');
+
+:root {
+  --bg-cream: #FBF0DC;
+  --tile-cream: #F4E4C1;
+  --tile-shadow: #E2CC9B;
+  
+  --chocolate: #5C4033;
+  --chocolate-shadow: #3E2A21;
+  
+  --buttercream: #EAD2AC;
+  --buttercream-shadow: #D2BA92;
+  
+  --text-main: #5C4033;
+  --text-muted: #8C6D62;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+  background-color: var(--bg-cream);
+}
+
+/* Page Base */
+.page-base {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background-color: var(--bg-cream);
+  font-family: 'Nunito', sans-serif;
+  margin: 0;
+  box-sizing: border-box;
+}
+
+/* 2048 Flat Tile Card */
+.tile-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 48px 36px;
+  background: var(--tile-cream);
+  border-radius: 16px;
+  box-shadow: 0 8px 0 var(--tile-shadow);
+  width: 90%;
+  max-width: 380px;
+  box-sizing: border-box;
+}
+
+.game-title {
+  font-family: 'Lilita One', 'Titan One', 'Fredoka', cursive, sans-serif;
+  font-weight: 800;
+  color: var(--chocolate);
+  font-size: 3rem; /* Slightly larger for emphasis */
+  margin: 0 0 6px 0;
+  text-align: center;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  
+  /* Chunky bottom shadow gives it a 3D stamped/frosted look */
+  text-shadow: 0 3px 0 var(--tile-shadow);
+}
+
+.game-subtitle {
+  color: var(--text-muted);
+  font-size: 1rem;
+  font-weight: 700;
+  margin: 0 0 36px 0;
+  text-align: center;
+}
+
+/* Button Stack */
+.btn-group {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+}
+
+/* Universal Button Base */
+.btn {
+  font-family: 'Fredoka', 'Nunito', sans-serif;
+  font-size: 1.1rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 12px;
+  padding: 18px;
+  cursor: pointer;
+  width: 100%;
+  transition: transform 0.08s ease, box-shadow 0.08s ease;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+/* Button Variants */
+.btn-chocolate {
+  background-color: var(--chocolate);
+  color: var(--bg-cream);
+  box-shadow: 0 5px 0 var(--chocolate-shadow);
+}
+.btn-chocolate:active {
+  transform: translateY(4px);
+  box-shadow: 0 1px 0 var(--chocolate-shadow);
+}
+
+.btn-butter {
+  background-color: var(--buttercream);
+  color: var(--chocolate);
+  box-shadow: 0 5px 0 var(--buttercream-shadow);
+}
+.btn-butter:active {
+  transform: translateY(4px);
+  box-shadow: 0 1px 0 var(--buttercream-shadow);
+}

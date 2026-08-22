@@ -11,17 +11,27 @@ export class Router {
     GAME: "GAME"
   }
 
+  static SlideTransitions = {
+    FORWARD: "forward",
+    BACKWARD: "back"
+  }
+
   constructor(appContainer, routes = {}, tictactoeApi, gameState) {
     this.appContainer = appContainer;
     this.routes = routes;
     this.tictactoeApi = tictactoeApi;
     this.gameState = gameState;
 
-    this.navigate("HOME");
+    this.navigate(
+      Router.Screens.HOME,
+      Router.SlideTransitions.FORWARD,
+      false,
+      {}
+    );
   }
 
-  navigate(screenName, params = {}) {
-    this.appContainer.replaceChildren();
+  navigate(screenName, direction = "forward", animate = true, params = {}) {
+    const oldPageElement = this.appContainer.firstElementChild;
 
     let activePage;
 
@@ -43,6 +53,25 @@ export class Router {
     }
     
     activePage.render();
+    const newPageElement = activePage.pageWrapper;
+
+    if (!animate || !oldPageElement) {
+      // If no animation is needed (like on initial boot), just clean up old elements
+      if (oldPageElement) oldPageElement.remove();
+      return;
+    }
+
+    if (direction === "back") {
+      oldPageElement.classList.add("slide-out-right");
+      newPageElement.classList.add("slide-in-left");
+    } else {
+      oldPageElement.classList.add("slide-out-left");
+      newPageElement.classList.add("slide-in-right");
+    }
+
+    oldPageElement.addEventListener("animationend", () => {
+      oldPageElement.remove();
+    }, { once: true });
   }
 
   render404() {

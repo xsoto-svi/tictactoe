@@ -62,7 +62,10 @@ export class HowToPlayPage extends Page {
 
   attachEvents() {
     this.okButton.addEventListener("click", () => {
-      this.router.navigate(Router.Screens.HOME);
+      this.router.navigate(
+        Router.Screens.HOME,
+        Router.SlideTransitions.BACKWARD
+      );
     });
   }
 

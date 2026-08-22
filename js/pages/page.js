@@ -11,5 +11,9 @@ export class Page extends ViewTemplate {
 
   render() {
     this.appContainer.append(this.pageWrapper);
+
+    requestAnimationFrame(() => {
+      this.pageWrapper.classList.add("slide-in");
+    });
   }
 }
