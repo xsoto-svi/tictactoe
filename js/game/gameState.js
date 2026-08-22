@@ -1,11 +1,26 @@
+import { GameStatus, PlayerSymbol } from "./gameConstants.js";
+
 export class GameState {
   constructor() {
     this.roomCode = null;
     this.symbol = null;
 
     this.board = Array(9).fill("");
-    this.status = "waiting"; // "waiting", "playing", "won", "lost", "draw"
+    this.status = GameStatus.WAITING;
     this.winner = null;
+  }
+
+  _updateBoard(newBoardArray) {
+    if (this.board.join() === newBoardArray.join()) {
+      return false;
+    }
+
+    const wasPlaying = this.status === GameStatus.PLAYING;
+    
+    this.board = newBoardArray;
+    this.evaluateGameStatus();
+
+    return wasPlaying && this.isGameOver;
   }
 
   joinRoom(roomCode, tile) {
@@ -22,27 +37,21 @@ export class GameState {
   }
 
   syncWithServer(serverBoardData) {
-    this.board = serverBoardData.split(":").slice(0,9);
-    this.evaluateGameStatus();
-  }
+    const nextBoard = serverBoardData.split(":").slice(0, 9);
 
-  get isMyTurn() {
-    if (this.status !== "playing") return false;
-
-    const xCount = this.board.filter((cell) => cell === "X").length;
-    const oCount = this.board.filter((cell) => cell === "O").length;
-
-    // Assuming X always makes the first move
-    const activeTurnSymbol = xCount <= oCount ? "X" : "O";
-
-    return this.symbol === activeTurnSymbol;
+    return this._updateBoard(nextBoard);
   }
 
   applyLocalMove(index) {
-    if (this.board[index] === "" && this.status === "playing") {
-      this.board[index] = this.symbol;
-      this.evaluateGameStatus();
+    if (this.board[index] === "" && this.status === GameStatus.PLAYING) {
+
+      const nextBoard = [...this.board];
+      nextBoard[index] = this.symbol;
+
+      return this._updateBoard(nextBoard);
     }
+
+    return false;
   }
 
   evaluateGameStatus() {
@@ -66,19 +75,37 @@ export class GameState {
         this.board[a] === this.board[c]
       ) {
         this.winner = this.board[a];
-        this.status = this.winner === this.symbol ? "won" : "lost";
+
+        this.status = GameStatus.GAME_OVER;
+
         return;
       }
     }
 
     if (!this.board.includes("")) {
-      this.status = "draw";
+      this.status = GameStatus.DRAW;
     }
   }
 
   resetLocalBoard() {
     this.board = Array(9).fill("");
-    this.status = "playing";
+    this.status = GameStatus.PLAYING;
     this.winner = null;
+  }
+
+  get isGameOver() {
+    return this.status === GameStatus.GAME_OVER;
+  }
+
+  get isMyTurn() {
+    if (this.status !== GameStatus.PLAYING) return false;
+
+    const xCount = this.board.filter((cell) => cell === PlayerSymbol.X).length;
+    const oCount = this.board.filter((cell) => cell === PlayerSymbol.O).length;
+
+    // Assuming X always makes the first move
+    const activeTurnSymbol = xCount <= oCount ? PlayerSymbol.X : PlayerSymbol.O;
+
+    return this.symbol === activeTurnSymbol;
   }
 }

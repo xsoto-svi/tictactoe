@@ -1,3 +1,4 @@
+import { GameStatus, PlayerSymbol } from "../../game/gameConstants.js";
 import { Modal } from "./modal.js";
 
 export class ResetGameModal extends Modal {
@@ -5,14 +6,14 @@ export class ResetGameModal extends Modal {
     container,
     isDismissible,
     symbol,
-    status,
+    winner,
     onPlayAgain,
     onLeave
   ) {
     super(container, isDismissible);
 
     this.symbol = symbol;
-    this.status = status;
+    this.winner = winner;
     this.onPlayAgain = onPlayAgain;
     this.onLeave = onLeave;
 
@@ -38,14 +39,12 @@ export class ResetGameModal extends Modal {
     this.statusMessage.classList.add("status-message");
     this.buttonsGroup.classList.add("btns-grp");
 
-    if (this.status === "won") {
+    if (this.winner === this.symbol) {
       this.statusMessage.textContent = "You Won! 🎉";
-    } else if (this.status === "lost") {
+    } else if (this.winner !== this.symbol) {
       this.statusMessage.textContent = "You Lost!";
-    } else if (this.status === "draw") {
+    } else if (this.winner === GameStatus.DRAW) {
       this.statusMessage.textContent = "It's a Draw!";
-    } else {
-      this.statusMessage.textContent = "Game Over";
     }
 
     this.leaveButton.textContent = "Leave";
@@ -76,7 +75,7 @@ export class ResetGameModal extends Modal {
     if (this.symbol) {
       this.playAgainButton.addEventListener("click", () => {
         this.close();
-        if (this.onPlayAgain) onPlayAgain(); 
+        if (this.onPlayAgain) this.onPlayAgain(); 
       });
     }
   }

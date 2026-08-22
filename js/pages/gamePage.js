@@ -1,7 +1,9 @@
 import { BoardComponent } from "../components/boardComponent.js";
 import { AlertModal } from "../components/modals/alertModal.js";
+import { LoadingModal } from "../components/modals/loadingModal.js";
 import { Modal } from "../components/modals/modal.js";
 import { ResetGameModal } from "../components/modals/resetGameModal.js";
+import { GameStatus, PlayerSymbol } from "../game/gameConstants.js";
 import { Page } from "./page.js";
 
 export class GamePage extends Page {
@@ -11,6 +13,9 @@ export class GamePage extends Page {
     this.tictactoeApi = tictactoeApi;
     this.gameState = gameState;
     this.isProcessingMove = false;
+
+    this.gameInterval = null;
+    this.rematchInterval = null;
 
     this.gameBoard = new BoardComponent((index) => this.onCellClick(index));
 
@@ -57,50 +62,12 @@ export class GamePage extends Page {
       }
     });
 
-    // Polls if room still exists
-    const boardInterval = setInterval(async () => {
-      try {
-        const boardData = await this.tictactoeApi.boardStatus(
-          this.gameState.roomCode,
-        );
-
-        if (boardData === "[GAME NOT YET STARTED]") {
-          clearInterval(boardInterval);
-          
-          const alertModal = new AlertModal("Game Over", "Your opponent left the game.");
-          alertModal.open();
-
-          this.router.navigate("/");
-          return;
-        }
-
-        this.gameState.syncWithServer(boardData);
-        this.updateUI(); // BUGFIX: Modal duplication
-
-      } catch (error) {
-        console.log("error:", error);
-        clearInterval(boardInterval);
-        
-        const alertModal = new AlertModal("Game Disconnected", "The room was closed.");
-        alertModal.open();
-        this.tictactoeApi.resetGame(this.gameState.roomCode).catch(() => {
-          console.log("Could not reset game; server is unreachable.");
-        });
-        this.router.navigate("/");
-      }
-    }, 500);
+    this.startGamePoll();
   }
 
   async onCellClick(index) {
-    console.log("--- CLICK DETECTED ---");
-    console.log("1. isProcessingMove:", this.isProcessingMove);
-    console.log("2. Game Status:", this.gameState.status);
-    console.log("3. My Symbol:", this.gameState.symbol);
-    console.log("4. isMyTurn:", this.gameState.isMyTurn);
-    console.log("5. Cell Content:", `"${this.gameState.board[index]}"`);
-
     if (this.isProcessingMove) return;
-    if (this.gameState.status !== "playing") return;
+    if (this.gameState.status !== GameStatus.PLAYING) return;
 
     if (!this.gameState.isMyTurn) {
       const alertModal = new AlertModal("Hold on!", "It is not your turn yet.");
@@ -127,8 +94,14 @@ export class GamePage extends Page {
       );
 
       if (response !== "[TAKEN]") {
-        this.gameState.applyLocalMove(index);
+        const didGameJustEnd = this.gameState.applyLocalMove(index);
         this.updateUI();
+
+        if (didGameJustEnd) {
+          const gameOverModal = this.createGameOverModal();
+          gameOverModal.open();
+        }
+
       } else {
         const alertModal = new AlertModal("Invalid Move", "That space is already taken!");
         alertModal.open();
@@ -144,39 +117,154 @@ export class GamePage extends Page {
   }
 
   updateUI() {
-    if (this.gameState.status === "waiting") {
+    if (this.gameState.status === GameStatus.WAITING) {
       this.gameStatusBar.textContent = "Waiting for opponent...";
-    } else if (this.gameState.status === "playing") {
+    } else if (this.gameState.status === GameStatus.PLAYING) {
       this.gameStatusBar.textContent = this.gameState.isMyTurn 
         ? "It's your turn" 
         : "Opponent's turn...";
-    } else if (this.gameState.status === "won") {
-
-      const gameOverModal = new ResetGameModal(
-        document.body,
-        false,
-        this.symbol,
-        this.gameState.status,
-        () => {                         
-          this.tictactoeApi.resetGame(this.gameState.roomCode);
-          this.isGameOverModalOpen = false;
-        },
-        () => {
-          this.tictactoeApi.resetGame(this.gameState.roomCode);
-          this.router.navigate("/");
-        }
-      )
-      gameOverModal.open();
+    } else if (this.gameState.status === GameStatus.GAME_OVER) {
 
       this.gameStatusBar.textContent = this.gameState.winner === this.gameState.symbol 
         ? "You Won! 🎉" 
         : "You Lost!";
-    } else if (this.gameState.status === "draw") {
+    } else if (this.gameState.status === GameStatus.DRAW) {
       this.gameStatusBar.textContent = "It's a draw!";
     }
 
     this.gameState.board.forEach((symbol, index) => {
       this.gameBoard.updateCell(index, symbol);
     });
+  }
+
+  createGameOverModal() {
+    return new ResetGameModal(
+      document.body,
+      false,
+      this.gameState.symbol,
+      this.gameState.winner,
+      async () => {
+        // 1. Both players generate the exact same next room code deterministically
+        const oldRoomCode = this.gameState.roomCode;
+        const nextRoomCode = this.gameState.roomCode + "r"; 
+
+        LoadingModal.showLoading("Joining...", "Setting up the rematch.");
+
+        try {
+          // 2. Whoever clicks first gets X. Whoever clicks second gets O.
+          // We save whatever symbol the server gives us to pass to the poll.
+          const newAssignedSymbol = await this.tictactoeApi.createGame(nextRoomCode);
+          this.startRematchPoll(oldRoomCode, nextRoomCode, newAssignedSymbol);
+        } catch (error) {
+          LoadingModal.hideLoading();
+          const alert = new AlertModal("Error", "Could not start rematch.");
+          alert.open();
+        }
+      },
+      () => {
+        // Only destroy the room if someone explicitly clicks "Leave"
+        this.tictactoeApi.resetGame(this.gameState.roomCode);
+        this.router.navigate("/");
+      }
+    );
+  }
+
+  startRematchPoll(oldRoomCode, nextRoomCode, newAssignedSymbol) {
+    this.stopAllPolls();
+
+    this.rematchInterval = setInterval(async () => {
+      try {
+
+        // Check if new room is ready
+        const isNextRoomReady = await this.tictactoeApi.checkRoomStatus(nextRoomCode);
+        
+        if (isNextRoomReady === "true") {
+          this.stopAllPolls();
+          LoadingModal.hideLoading();
+          
+          // clean-up previous rooms
+          if (this.gameState.symbol === PlayerSymbol.O) {
+            this.tictactoeApi.resetGame(oldRoomCode).catch(() => {});
+          }
+
+          this.gameState.joinRoom(nextRoomCode, newAssignedSymbol);
+
+          this.updateUI();
+          this.startGamePoll();
+          return;
+        }
+
+        // Check if the opponent left the old room
+        const oldRoomData = await this.tictactoeApi.boardStatus(oldRoomCode);
+        
+        if (oldRoomData === "[GAME NOT YET STARTED]") {
+          // THE OPPONENT LEFT!
+          this.stopAllPolls();
+          LoadingModal.hideLoading();
+          
+          // Clean up the new room so it doesn't stay abandoned on the server
+          this.tictactoeApi.resetGame(nextRoomCode).catch(() => {}); 
+          
+          const alert = new AlertModal("Game Over", "Your opponent left the game.");
+          alert.open();
+          this.router.navigate("/");
+          return;
+        }
+
+      } catch (error) {
+        this.stopAllPolls();
+        LoadingModal.hideLoading();
+        const alertModal = new AlertModal("Game Error" , "Connection lost.");
+        alertModal.open();
+        this.router.navigate("/");
+      }
+    }, 1000);
+  }
+
+  startGamePoll() {
+    this.stopAllPolls();
+
+    this.gameInterval = setInterval(async () => {
+      try {
+        const boardData = await this.tictactoeApi.boardStatus(this.gameState.roomCode);
+
+        if (boardData === "[GAME NOT YET STARTED]") {
+          this.stopAllPolls();
+          
+          const alertModal = new AlertModal("Game Over", "Your opponent left the game.");
+          alertModal.open();
+
+          this.router.navigate("/");
+          return;
+        }
+
+        const didGameJustEnd = this.gameState.syncWithServer(boardData);
+        
+        if (this.gameState.isGameOver) { 
+          this.stopAllPolls();
+        }
+
+        this.updateUI();
+
+        if (didGameJustEnd) {
+          const gameOverModal = this.createGameOverModal();
+          gameOverModal.open();
+        }
+
+      } catch (error) {
+        console.log("error:", error);
+        this.stopAllPolls();
+        
+        const alertModal = new AlertModal("Game Disconnected", "The room was closed.");
+        alertModal.open();
+        this.tictactoeApi.resetGame(this.gameState.roomCode).catch(() => {});
+        this.router.navigate("/");
+      }
+    }, 500);
+  }
+
+  stopAllPolls() {
+    if (this.gameInterval) clearInterval(this.gameInterval);
+    if (this.rematchInterval) clearInterval(this.rematchInterval);
   }
 }

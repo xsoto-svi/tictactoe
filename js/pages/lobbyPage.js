@@ -116,7 +116,7 @@ export class LobbyPage extends Page {
         }, 500);
       } catch (error) {
         const alertModal = new AlertModal("Network Error", "Could not create the game on the server.");
-        alertModal.show();
+        alertModal.open();
       }
     });
 
@@ -131,7 +131,7 @@ export class LobbyPage extends Page {
 
       if (enteredCode.length !== 4) {
         const alertModal = new AlertModal("Invalid Input", "Please enter a valid 4-character code.");
-        alertModal.show();
+        alertModal.open();
         return;
       }
 
@@ -146,7 +146,7 @@ export class LobbyPage extends Page {
           // If we got "X", the room didn't exist and the server just made a new one
           this.tictactoeApi.resetGame(enteredCode);
           const alertModal = new AlertModal("Room Not Found", "Please check the code and try again.");
-          alertModal.show();
+          alertModal.open();
           
         } else if (symbol === PlayerSymbol.O) {
           this.gameState.joinRoom(enteredCode, PlayerSymbol.O);
@@ -155,12 +155,12 @@ export class LobbyPage extends Page {
         } else {
 
           const alertModal = new AlertModal("Unable to Join", symbol);
-          alertModal.show();
+          alertModal.open();
         }
       } catch (error) {
 
         const alertModal = new AlertModal("Network Error", "Could not connect to the server.");
-        alertModal.show();
+        alertModal.open();
       }
     });
   }
