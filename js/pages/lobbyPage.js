@@ -20,19 +20,20 @@ export class LobbyPage extends Page {
   }
 
   initializeElements() {
-    this.pageWrapper = document.createElement("div");
     this.title = document.createElement("h1");
+    this.subtitle = document.createElement("p");
 
-    this.createGameContainer = document.createElement("div");
+    this.cardsWrapper = document.createElement("div");
+
+    this.createGameCard = document.createElement("div");
     this.createGameHeading = document.createElement("h2");
     this.createGameDescription = document.createElement("p");
     this.createGameButton = document.createElement("button");
 
-    this.joinGameContainer = document.createElement("div");
+    this.joinGameCard = document.createElement("div");
     this.joinGameHeading = document.createElement("h2");
     this.joinGameDescription = document.createElement("p");
-
-    this.joinGameLabel = document.createElement("label");
+    this.joinGameInputWrapper = document.createElement("div");
     this.joinGameTextbox = document.createElement("input");
     this.joinGameButton = document.createElement("button");
 
@@ -41,50 +42,70 @@ export class LobbyPage extends Page {
 
   setAttributes() {
     this.pageWrapper.classList.add("page-container");
+    this.pageWrapper.classList.add("page-base");
 
-    this.createGameContainer.classList.add("option-container");
-    this.createGameHeading.classList.add("option-heading");
-    this.createGameHeading.textContent = "Create Game";
-    this.createGameDescription.classList.add("description");
-    this.createGameDescription.textContent = "Create Game Description";
-    this.createGameButton.classList.add("btn-create");
-    this.createGameButton.textContent = "Create";
+    this.title.classList.add("game-title");
+    this.title.textContent = "Lobby";
 
-    this.joinGameContainer.classList.add("option-container");
-    this.joinGameHeading.classList.add("option-heading");
+    this.subtitle.classList.add("game-subtitle");
+    this.subtitle.textContent = "Choose your game mode";
+
+    this.cardsWrapper.classList.add("lobby-cards-wrapper");
+
+    this.createGameCard.classList.add("tile-card", "lobby-card");
+    this.createGameHeading.classList.add("card-heading");
+    this.createGameHeading.textContent = "Host Game";
+    this.createGameDescription.classList.add("card-desc");
+    this.createGameDescription.textContent = "Generate a private room and wait for an opponent.";
+    this.createGameButton.classList.add("btn", "btn-chocolate");
+    this.createGameButton.textContent = "Create Room";
+
+    this.joinGameCard.classList.add("tile-card", "lobby-card");
+    this.joinGameHeading.classList.add("card-heading");
     this.joinGameHeading.textContent = "Join Game";
-    this.joinGameDescription.classList.add("description");
-    this.joinGameDescription.textContent = "Join Game Description";
-
-    this.joinGameLabel.textContent = "Enter Code";
+    this.joinGameDescription.classList.add("card-desc");
+    this.joinGameDescription.textContent = "Enter a 4-character code to join a friend.";
+    
+    this.joinGameInputWrapper.classList.add("input-group");
+    this.joinGameTextbox.type = "text";
+    this.joinGameTextbox.placeholder = "CODE";
     this.joinGameTextbox.maxLength = 4;
-    this.joinGameButton.classList.add("btn-join");
+    this.joinGameTextbox.classList.add("code-input");
+
+    this.joinGameButton.classList.add("btn", "btn-butter");
     this.joinGameButton.textContent = "Join";
 
-    this.backButton.classList.add("back-button");
-    this.backButton.textContent = "Back";
+    this.backButton.classList.add("btn", "btn-butter");
+    this.backButton.style.marginTop = "16px";
+    this.backButton.style.maxWidth = "200px";
+    this.backButton.textContent = "Back to Menu";
   }
 
   appendElements() {
-    this.createGameContainer.append(
+    // Assemble Create Card
+    this.createGameCard.append(
       this.createGameHeading,
       this.createGameDescription,
-      this.createGameButton,
+      this.createGameButton
     );
 
-    this.joinGameContainer.append(
+    // Assemble Join Card (Input and button wrapped nicely)
+    this.joinGameInputWrapper.append(this.joinGameTextbox, this.joinGameButton);
+    this.joinGameCard.append(
       this.joinGameHeading,
       this.joinGameDescription,
-      this.joinGameLabel,
-      this.joinGameTextbox,
-      this.joinGameButton,
+      this.joinGameInputWrapper
     );
 
+    // Assemble Cards Wrapper
+    this.cardsWrapper.append(this.createGameCard, this.joinGameCard);
+
+    // Assemble Main Page
     this.pageWrapper.append(
       this.title,
-      this.createGameContainer,
-      this.joinGameContainer,
-      this.backButton,
+      this.subtitle,
+      this.cardsWrapper,
+      this.backButton
     );
   }
 

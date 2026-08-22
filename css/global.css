@@ -4,6 +4,7 @@
 @import url('./components/common/modal.css');
 @import url('./pages/page.css');
 @import url('./pages/how-to-play-page.css');
+@import url('./pages/lobby-page.css');
 
 :root {
   --bg-cream: #FBF0DC;
