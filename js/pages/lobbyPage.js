@@ -2,6 +2,7 @@ import { AlertModal } from "../components/modals/alertModal.js";
 import { LoadingModal } from "../components/modals/loadingModal.js";
 import { Modal } from "../components/modals/modal.js";
 import { GameStatus, PlayerSymbol } from "../game/gameConstants.js";
+import { Router } from "../router.js";
 import { Page } from "./page.js";
 
 export class LobbyPage extends Page {
@@ -48,7 +49,7 @@ export class LobbyPage extends Page {
     this.title.textContent = "Lobby";
 
     this.subtitle.classList.add("game-subtitle");
-    this.subtitle.textContent = "Choose your game mode";
+    this.subtitle.textContent = "Choose how you want to start a game!";
 
     this.cardsWrapper.classList.add("lobby-cards-wrapper");
 
@@ -111,15 +112,17 @@ export class LobbyPage extends Page {
 
   attachEvents() {
     this.backButton.addEventListener("click", () => {
-      this.router.navigate("/");
+      this.router.navigate(Router.Screens.HOME, Router.SlideTransitions.BACKWARD);
     });
 
     this.createGameButton.addEventListener("click", async () => {
-      // const roomCode = Math.random().toString(36).substring(2, 6);
-      const roomCode = "test";
+      // const roomCode = Math.random().toString(36).substring(2, 6).toUpperCase();
+      const roomCode = "TEST";
       LoadingModal.showLoading(
         "Room Created",
-        `Waiting for opponent... Code: ${roomCode}`,
+        `Waiting for opponent...`,
+        roomCode,
+        "Copy this code and share it with your friend!"
       );
 
       try {
@@ -132,13 +135,17 @@ export class LobbyPage extends Page {
             LoadingModal.hideLoading();
             clearInterval(checkInterval);
             this.gameState.status = GameStatus.PLAYING;
-            this.router.navigate("/game");
+            this.router.navigate(Router.Screens.GAME);
           }
         }, 500);
       } catch (error) {
         const alertModal = new AlertModal("Network Error", "Could not create the game on the server.");
         alertModal.open();
       }
+    });
+
+    this.joinGameTextbox.addEventListener("input", (event) => {
+      this.joinGameTextbox.value = event.target.value.toUpperCase();
     });
 
     this.joinGameTextbox.addEventListener("keydown", (event) => {
@@ -172,7 +179,7 @@ export class LobbyPage extends Page {
         } else if (symbol === PlayerSymbol.O) {
           this.gameState.joinRoom(enteredCode, PlayerSymbol.O);
           this.gameState.status = GameStatus.PLAYING;          
-          this.router.navigate("/game");
+          this.router.navigate(Router.Screens.GAME);
         } else {
 
           const alertModal = new AlertModal("Unable to Join", symbol);

@@ -1,48 +1,174 @@
+/* Dark semi-transparent backdrop overlay with a subtle fade-in */
 .modal-overlay {
-    display: flex !important;
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: rgba(0, 0, 0, 0.5);
-    justify-content: center;
-    align-items: center;
-    z-index: 9999;
-    backdrop-filter: blur(2px); 
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(62, 42, 33, 0.4); /* Deep chocolate tint */
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: modalFadeIn 0.2s ease-out forwards;
+}
+
+/* Modal Content Box styled like a 2048 Tile Card */
+.modal-content {
+  margin: 0 0 12px 0;
+  background-color: var(--tile-cream);
+  border: 4px solid var(--tile-shadow);
+  border-radius: 20px;
+  padding: 36px 28px;
+  width: 85%;
+  max-width: 360px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  box-shadow: 0 10px 0 var(--tile-shadow), 0 15px 30px rgba(0, 0, 0, 0.15);
+  box-sizing: border-box;
+  animation: modalScaleUp 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Modal Headings */
+.modal-content h2 {
+  font-family: 'Lilita One', 'Fredoka', sans-serif;
+  color: var(--chocolate);
+  font-size: 1.6rem;
+  margin: 0 0 12px 0;
+  letter-spacing: 1px;
+}
+
+/* Modal Descriptions / Body Text */
+.modal-content p, 
+.status-message {
+  color: var(--text-muted);
+  font-family: 'Nunito', sans-serif;
+  font-size: 1rem;
+  font-weight: 700;
+  margin: 0 0 24px 0;
+  line-height: 1.4;
+}
+
+/* Buttons Group for Actions (like Rematch / Leave) */
+.btns-grp {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+}
+
+/* Reusing your global button base classes or mapping modal buttons */
+.modal-content button,
+.primary-button,
+.secondary-button {
+  font-family: 'Fredoka', 'Nunito', sans-serif;
+  font-size: 1rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 12px;
+  padding: 14px;
+  cursor: pointer;
+  width: 100%;
+  transition: transform 0.08s ease, box-shadow 0.08s ease;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  box-sizing: border-box;
+}
+
+/* Primary Button Styling (e.g., OK, Play Again) */
+.modal-content button:not(.secondary-button),
+.primary-button {
+  background-color: var(--chocolate);
+  color: var(--bg-cream);
+  box-shadow: 0 4px 0 var(--chocolate-shadow);
+}
+
+.modal-content button:not(.secondary-button):active,
+.primary-button:active {
+  transform: translateY(3px);
+  box-shadow: 0 1px 0 var(--chocolate-shadow);
+}
+
+.modal-code-badge {
+  background-color: var(--bg-cream);
+  border: 2px dashed var(--tile-shadow);
+  border-radius: 12px;
+  padding: 12px 20px;
+  margin-top: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.modal-code-badge span {
+  font-family: 'Fredoka', 'Nunito', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+
+/* The actual code text formatted large and clear */
+.modal-code-text {
+  font-size: 1.3rem !important;
+  color: var(--chocolate) !important;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+.modal-sub-desc {
+  font-size: 0.85rem !important;
+  color: var(--chocolate) !important;
+  font-weight: 600 !important;
+  margin: 12px 0 6px 0 !important;
+  opacity: 0.85;
+}
+
+/* Code badge styling */
+.modal-code-badge {
+  background-color: var(--bg-cream);
+  border: 2px dashed var(--tile-shadow);
+  border-radius: 12px;
+  padding: 10px 16px;
+  margin: 0 !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Secondary Button Styling (e.g., Leave Room) */
+.secondary-button {
+  background-color: var(--buttercream);
+  color: var(--chocolate);
+  box-shadow: 0 4px 0 var(--buttercream-shadow);
+}
+
+.secondary-button:active {
+  transform: translateY(3px);
+  box-shadow: 0 1px 0 var(--buttercream-shadow);
+}
+
+/* Smooth Entrance Keyframes */
+@keyframes modalFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes modalScaleUp {
+  from {
+    opacity: 0;
+    transform: scale(0.9) translateY(10px);
   }
-  
-  .modal-content {
-    box-sizing: border-box;
-    background-color: white;
-    padding: 32px 28px;
-    border-radius: 8px;
-    width: 90%;
-    max-width: 450px;
-    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15), 0 4px 8px rgba(0, 0, 0, 0.1);
-    display: flex;
-    flex-direction: column;
-    gap: 24px;
-    max-height: 90vh; 
-    overflow-y: auto;
-    animation: modalPopIn 0.25s cubic-bezier(0, 0, 0.2, 1);
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
   }
-  
-  .modal-content h3 {
-    margin: 0;
-    color: #202124;
-    font-size: 1.5rem;
-    font-weight: 500;
-    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-  }
-  
-  @keyframes modalPopIn {
-    from { 
-      opacity: 0; 
-      transform: scale(0.95) translateY(10px);
-    }
-    to { 
-      opacity: 1; 
-      transform: scale(1) translateY(0); 
-    }
-  }
+}

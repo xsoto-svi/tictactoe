@@ -146,7 +146,7 @@ export class GamePage extends Page {
       async () => {
         // 1. Both players generate the exact same next room code deterministically
         const oldRoomCode = this.gameState.roomCode;
-        const nextRoomCode = this.gameState.roomCode + "r"; 
+        const nextRoomCode = this.gameState.roomCode + "R"; 
 
         LoadingModal.showLoading("Joining...", "Setting up the rematch.");
 
