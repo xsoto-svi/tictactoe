@@ -3,6 +3,7 @@
 @import url('./pages/page.css');
 @import url('./pages/how-to-play-page.css');
 @import url('./pages/lobby-page.css');
+@import url('./pages/game-page.css');
 
 :root {
   --bg-cream: #FBF0DC;

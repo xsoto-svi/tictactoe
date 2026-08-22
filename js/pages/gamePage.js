@@ -4,6 +4,7 @@ import { LoadingModal } from "../components/modals/loadingModal.js";
 import { Modal } from "../components/modals/modal.js";
 import { ResetGameModal } from "../components/modals/resetGameModal.js";
 import { GameStatus, PlayerSymbol } from "../game/gameConstants.js";
+import { Router } from "../router.js";
 import { Page } from "./page.js";
 
 export class GamePage extends Page {
@@ -16,6 +17,7 @@ export class GamePage extends Page {
 
     this.gameInterval = null;
     this.rematchInterval = null;
+    this.toastTimeout = null;
 
     this.gameBoard = new BoardComponent((index) => this.onCellClick(index));
 
@@ -26,26 +28,17 @@ export class GamePage extends Page {
   }
 
   initializeElements() {
-    this.title = document.createElement("h1");
     this.gameStatusBar = document.createElement("div");
-    this.gameStatusText = document.createElement("p");
-
     this.errorStatusBar = document.createElement("div");
-    this.errorStatusBarText = document.createElement("p");
   }
 
   setAttributes() {
-    this.title.classList.add("title");
-    this.title.textContent = "Tic-Tac-Toe";
-    
     this.gameStatusBar.classList.add("status-bar");
     this.errorStatusBar.classList.add("error-bar")
-    this.errorStatusBarText.textContent = ""
   }
 
   appendElements() {
     this.pageWrapper.append(
-      this.title,
       this.gameStatusBar,
       this.errorStatusBar,
       this.gameBoard.getHTML(),
@@ -65,19 +58,29 @@ export class GamePage extends Page {
     this.startGamePoll();
   }
 
+  showErrorToast(message) {
+    this.errorStatusBar.textContent = message;
+    this.errorStatusBar.classList.add("show");
+
+    if (this.toastTimeout) clearTimeout(this.toastTimeout);
+
+    this.toastTimeout = setTimeout(() => {
+      this.errorStatusBar.textContent = "";
+      this.errorStatusBar.classList.remove("show");
+    }, 2500); // Disappears after 2.5 seconds
+  }
+
   async onCellClick(index) {
     if (this.isProcessingMove) return;
     if (this.gameState.status !== GameStatus.PLAYING) return;
 
     if (!this.gameState.isMyTurn) {
-      const alertModal = new AlertModal("Hold on!", "It is not your turn yet.");
-      alertModal.open();
+      this.showErrorToast("It's not your turn yet.");
       return;
     }
 
     if (this.gameState.board[index] !== "") {
-      const alertModal = new AlertModal("Invalid Move", "That space is already taken!");
-      alertModal.open();
+      this.showErrorToast("That space is already taken!");
       return;
     }
 
@@ -103,14 +106,12 @@ export class GamePage extends Page {
         }
 
       } else {
-        const alertModal = new AlertModal("Invalid Move", "That space is already taken!");
-        alertModal.open();
+        this.showErrorToast("That space is already taken!");
       }
       
     } catch (error) {
       console.log("error = ", error);
-      const alertModal = new AlertModal("Network Error", "Failed to send move.");
-      alertModal.open();
+      this.showErrorToast("Network Error: Failed to send move.");
     } finally {
       this.isProcessingMove = false;
     }
@@ -164,7 +165,7 @@ export class GamePage extends Page {
       () => {
         // Only destroy the room if someone explicitly clicks "Leave"
         this.tictactoeApi.resetGame(this.gameState.roomCode);
-        this.router.navigate("/");
+        this.router.navigate(Router.Screens.HOME);
       }
     );
   }
@@ -207,7 +208,7 @@ export class GamePage extends Page {
           
           const alert = new AlertModal("Game Over", "Your opponent left the game.");
           alert.open();
-          this.router.navigate("/");
+          this.router.navigate(Router.Screens.HOME);
           return;
         }
 
@@ -216,7 +217,7 @@ export class GamePage extends Page {
         LoadingModal.hideLoading();
         const alertModal = new AlertModal("Game Error" , "Connection lost.");
         alertModal.open();
-        this.router.navigate("/");
+        this.router.navigate(Router.Screens.HOME);
       }
     }, 1000);
   }
@@ -234,7 +235,7 @@ export class GamePage extends Page {
           const alertModal = new AlertModal("Game Over", "Your opponent left the game.");
           alertModal.open();
 
-          this.router.navigate("/");
+          this.router.navigate(Router.Screens.HOME);
           return;
         }
 
@@ -258,7 +259,7 @@ export class GamePage extends Page {
         const alertModal = new AlertModal("Game Disconnected", "The room was closed.");
         alertModal.open();
         this.tictactoeApi.resetGame(this.gameState.roomCode).catch(() => {});
-        this.router.navigate("/");
+        this.router.navigate(Router.Screens.HOME);
       }
     }, 500);
   }

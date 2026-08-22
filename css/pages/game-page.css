@@ -1,0 +1,32 @@
+.status-bar {
+  font-family: 'Nunito', 'Fredoka', sans-serif;
+  background-color: var(--tile-cream);
+  border: 2px solid var(--tile-shadow);
+  color: var(--chocolate);
+  font-weight: 700;
+  font-size: 1rem;
+  padding: 10px 20px;
+  border-radius: 12px;
+  margin-bottom: 12px;
+  text-align: center;
+  min-width: 200px;
+  box-shadow: 0 4px 0 var(--tile-shadow);
+}
+
+.error-bar {
+  font-family: 'Fredoka', 'Nunito', sans-serif;
+  color: #c0392b;
+  font-size: 0.9rem;
+  font-weight: 700;
+  height: 24px; /* Reserves space so layout doesn't jump */
+  margin-bottom: 8px;
+  text-align: center;
+  opacity: 0;
+  transform: translateY(-4px);
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.error-bar.show {
+  opacity: 1;
+  transform: translateY(0);
+}

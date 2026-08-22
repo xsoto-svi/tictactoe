@@ -1,37 +1,63 @@
 .board {
-    display: grid;
-    grid-template-columns: repeat(3, 100px);
-    grid-template-rows: repeat(3, 100px);
-    gap: 8px;
-    background-color: #2c3e50;
-    padding: 8px;
-    border-radius: 12px;
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-    width: fit-content;
-    margin: 20px auto;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(3, 1fr);
+  gap: 12px;
+  background-color: var(--tile-shadow); /* Gives it a solid recessed board feel */
+  padding: 14px;
+  border-radius: 20px;
+  width: 320px;
+  height: 320px;
+  box-sizing: border-box;
+  box-shadow: inset 0 4px 6px rgba(0, 0, 0, 0.05);
+  margin: 16px 0;
+}
+
+.cell {
+  background-color: var(--tile-cream);
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Lilita One', 'Fredoka', sans-serif;
+  font-size: 2.8rem;
+  font-weight: 700;
+  color: var(--chocolate);
+  cursor: pointer;
+  user-select: none;
+  box-shadow: 0 4px 0 var(--tile-shadow);
+  transition: transform 0.08s ease, background-color 0.15s ease, box-shadow 0.08s ease;
+}
+
+/* Hover state for empty cells */
+.cell:not(.cell-filled):hover {
+  background-color: #f7ebdb;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 0 var(--tile-shadow);
+}
+
+/* Click/Active state */
+.cell:not(.cell-filled):active {
+  transform: translateY(2px);
+  box-shadow: 0 2px 0 var(--tile-shadow);
+}
+
+/* State when filled with X or O */
+.cell-filled {
+  background-color: #faebd7; /* Slightly warmer solid tone when taken */
+  box-shadow: 0 2px 0 var(--tile-shadow);
+  transform: translateY(2px);
+  animation: popInCell 0.15s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Quick pop animation when a mark appears */
+@keyframes popInCell {
+  0% {
+    transform: scale(0.8) translateY(2px);
+    opacity: 0.5;
   }
-  
-  .cell {
-    background-color: #ffffff;
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 3rem;
-    font-weight: bold;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    color: #333333;
-    cursor: pointer;
-    user-select: none;
-    transition: background-color 0.2s ease, transform 0.1s ease;
+  100% {
+    transform: scale(1) translateY(2px);
+    opacity: 1;
   }
-  
-  .cell:not(.cell-filled):hover {
-    background-color: #f0f4f8;
-    transform: scale(0.98);
-  }
-  
-  .cell-filled {
-    cursor: not-allowed;
-    background-color: #f8fafc;
-  }
+}
