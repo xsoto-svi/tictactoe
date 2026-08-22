@@ -1,6 +1,7 @@
 import { AlertModal } from "../components/modals/alertModal.js";
 import { LoadingModal } from "../components/modals/loadingModal.js";
 import { Modal } from "../components/modals/modal.js";
+import { GameStatus, PlayerSymbol } from "../game/gameConstants.js";
 import { Page } from "./page.js";
 
 export class LobbyPage extends Page {
@@ -109,7 +110,7 @@ export class LobbyPage extends Page {
           if (isReady == "true") {
             LoadingModal.hideLoading();
             clearInterval(checkInterval);
-            this.gameState.status = "playing";
+            this.gameState.status = GameStatus.PLAYING;
             this.router.navigate("/game");
           }
         }, 500);
@@ -141,15 +142,15 @@ export class LobbyPage extends Page {
 
         LoadingModal.hideLoading();
 
-        if (symbol === "X") {
+        if (symbol === PlayerSymbol.X) {
           // If we got "X", the room didn't exist and the server just made a new one
           this.tictactoeApi.resetGame(enteredCode);
           const alertModal = new AlertModal("Room Not Found", "Please check the code and try again.");
           alertModal.show();
           
-        } else if (symbol === "O") {
-          this.gameState.joinRoom(enteredCode, "O");
-          this.gameState.status = "playing";          
+        } else if (symbol === PlayerSymbol.O) {
+          this.gameState.joinRoom(enteredCode, PlayerSymbol.O);
+          this.gameState.status = GameStatus.PLAYING;          
           this.router.navigate("/game");
         } else {
 
