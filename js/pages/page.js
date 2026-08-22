@@ -5,10 +5,8 @@ export class Page extends ViewTemplate {
     super();
     this.appContainer = appContainer;
     this.pageWrapper = document.createElement("div");
-  }
 
-  setAttributes() {
-    this.pageWrapper.classList.add("page-container");
+    this.pageWrapper.classList.add("page-base");
   }
 
   render() {
