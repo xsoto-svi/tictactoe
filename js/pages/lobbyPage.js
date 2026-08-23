@@ -117,9 +117,8 @@ export class LobbyPage extends Page {
     });
 
     this.createGameButton.addEventListener("click", async () => {
-      // const roomCode = Math.random().toString(36).substring(2, 6).toUpperCase();
+      const roomCode = Math.random().toString(36).substring(2, 6).toUpperCase();
       LoadingModal.showLoading("Connecting to server...", "Please wait...")
-      const roomCode = "TEST";
 
       try {
         const symbol = await this.tictactoeApi.createGame(roomCode);
