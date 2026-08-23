@@ -30,8 +30,7 @@ export class ResetGameModal extends Modal {
     this.buttonsGroup = document.createElement("div");
 
     this.leaveButton = document.createElement("button");
-    // if Spectator
-    /*********** */
+    
     if (this.symbol) {
       this.playAgainButton = document.createElement("button");
     }

@@ -176,7 +176,6 @@ export class GamePage extends Page {
       }
       
     } catch (error) {
-      console.log("error = ", error);
       this.showErrorToast("Network Error: Failed to send move.");
     } finally {
       this.isProcessingMove = false;
