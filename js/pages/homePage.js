@@ -28,7 +28,7 @@ export class HomePage extends Page {
     this.title.textContent = "Tic-Tac-Toe";
 
     this.subtitle.classList.add("game-subtitle");
-    this.subtitle.textContent = "A simple game";
+    this.subtitle.textContent = "The classic X and O game of strategy and fun.";
     
     this.menuContainer.classList.add("btn-group");
 
