@@ -20,6 +20,8 @@ export class GamePage extends Page {
     this.rematchInterval = null;
     this.toastTimeout = null;
 
+    this.isGameOverModalPresent = false;
+
     this.gameBoard = new BoardComponent((index) => this.onCellClick(index));
 
     this.initializeElements();
@@ -119,12 +121,11 @@ export class GamePage extends Page {
       );
 
       if (response !== "[TAKEN]") {
-        const didGameJustEnd = this.gameState.applyLocalMove(index);
+        this.gameState.applyLocalMove(index);
         this.updateUI();
 
-        if (didGameJustEnd) {
-          const gameOverModal = this.createGameOverModal();
-          gameOverModal.open();
+        if (this.gameState.isGameOver) {
+          this.showGameOverModal();
         }
 
       } else {
@@ -176,23 +177,26 @@ export class GamePage extends Page {
     }, 2500); // Disappears after 2.5 seconds
   }
 
-  createGameOverModal() {
-    return new ResetGameModal(
+  showGameOverModal() {
+    if (this.isGameOverModalPresent) {
+      return;
+    }
+
+    this.isGameOverModalPresent = true;
+    const resetGameModal = new ResetGameModal(
       document.body,
       false,
       this.gameState.symbol,
       this.gameState.winner,
       this.gameState.status,
       async () => {
-        // 1. Both players generate the exact same next room code deterministically
+        // Both players generate the exact same next room code deterministically
         const oldRoomCode = this.gameState.roomCode;
         const nextRoomCode = this.gameState.roomCode + "R"; 
 
         LoadingModal.showLoading("Joining...", "Setting up the rematch.");
 
         try {
-          // 2. Whoever clicks first gets X. Whoever clicks second gets O.
-          // We save whatever symbol the server gives us to pass to the poll.
           const newAssignedSymbol = await this.tictactoeApi.createGame(nextRoomCode);
           this.startRematchPoll(oldRoomCode, nextRoomCode, newAssignedSymbol);
         } catch (error) {
@@ -200,13 +204,18 @@ export class GamePage extends Page {
           const alert = new AlertModal("Error", "Could not start rematch.");
           alert.open();
         }
+
+        this.isGameOverModalPresent = false;
       },
       () => {
         // Only destroy the room if someone explicitly clicks "Leave"
+        this.isGameOverModalPresent = false;
         this.tictactoeApi.resetGame(this.gameState.roomCode);
         this.router.navigate(Router.Screens.HOME);
       }
     );
+
+    resetGameModal.open();
   }
 
   startRematchPoll(oldRoomCode, nextRoomCode, newAssignedSymbol) {
@@ -278,18 +287,14 @@ export class GamePage extends Page {
           return;
         }
 
-        const didGameJustEnd = this.gameState.syncWithServer(boardData);
-        
-        if (this.gameState.isGameOver) { 
+        this.gameState.syncWithServer(boardData);
+      
+        if (this.gameState.isGameOver) {
           this.stopAllPolls();
+          this.showGameOverModal();
         }
 
         this.updateUI();
-
-        if (didGameJustEnd) {
-          const gameOverModal = this.createGameOverModal();
-          gameOverModal.open();
-        }
 
       } catch (error) {
         console.log("error:", error);

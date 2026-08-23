@@ -10,17 +10,6 @@ export class GameState {
     this.winner = null;
   }
 
-  _updateBoard(newBoardArray) {
-    if (this.board.join() === newBoardArray.join()) {
-      return false;
-    }
-    
-    this.board = newBoardArray;
-    this.evaluateGameStatus();
-
-    return this.isGameOver;
-  }
-
   joinRoom(roomCode, tile) {
     this.roomCode = roomCode;
     this.symbol = tile;
@@ -34,22 +23,18 @@ export class GameState {
     };
   }
 
+  // For update board poll
   syncWithServer(serverBoardData) {
-    const nextBoard = serverBoardData.split(":").slice(0, 9);
-
-    return this._updateBoard(nextBoard);
+    this.board = serverBoardData.split(":").slice(0, 9);
+    this.evaluateGameStatus();
   }
 
+  // If user interacts with UI
   applyLocalMove(index) {
     if (this.board[index] === "" && this.status === GameStatus.PLAYING) {
-
-      const nextBoard = [...this.board];
-      nextBoard[index] = this.symbol;
-
-      return this._updateBoard(nextBoard);
+      this.board[index] = this.symbol;
     }
-
-    return false;
+    this.evaluateGameStatus();
   }
 
   evaluateGameStatus() {
