@@ -14,13 +14,11 @@ export class GameState {
     if (this.board.join() === newBoardArray.join()) {
       return false;
     }
-
-    const wasPlaying = this.status === GameStatus.PLAYING;
     
     this.board = newBoardArray;
     this.evaluateGameStatus();
 
-    return wasPlaying && this.isGameOver;
+    return this.isGameOver;
   }
 
   joinRoom(roomCode, tile) {
@@ -94,7 +92,7 @@ export class GameState {
   }
 
   get isGameOver() {
-    return this.status === GameStatus.GAME_OVER;
+    return this.status === GameStatus.GAME_OVER || this.status === GameStatus.DRAW;
   }
 
   get isMyTurn() {

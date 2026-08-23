@@ -7,6 +7,7 @@ export class ResetGameModal extends Modal {
     isDismissible,
     symbol,
     winner,
+    status,
     onPlayAgain,
     onLeave
   ) {
@@ -14,6 +15,7 @@ export class ResetGameModal extends Modal {
 
     this.symbol = symbol;
     this.winner = winner;
+    this.status = status;
     this.onPlayAgain = onPlayAgain;
     this.onLeave = onLeave;
 
@@ -41,10 +43,10 @@ export class ResetGameModal extends Modal {
 
     if (this.winner === this.symbol) {
       this.statusMessage.textContent = "You Won! 🎉";
+    } else if (this.status === GameStatus.DRAW) {
+      this.statusMessage.textContent = "It's a Draw!";
     } else if (this.winner !== this.symbol) {
       this.statusMessage.textContent = "You Lost!";
-    } else if (this.winner === GameStatus.DRAW) {
-      this.statusMessage.textContent = "It's a Draw!";
     }
 
     this.leaveButton.textContent = "Leave";

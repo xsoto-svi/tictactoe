@@ -152,7 +152,6 @@ export class GamePage extends Page {
         this.gameStatusBar.classList.remove("my-turn");
       }
     } else if (this.gameState.status === GameStatus.GAME_OVER) {
-
       this.gameStatusBar.textContent = this.gameState.winner === this.gameState.symbol 
         ? "You Won! 🎉" 
         : "You Lost!";
@@ -183,6 +182,7 @@ export class GamePage extends Page {
       false,
       this.gameState.symbol,
       this.gameState.winner,
+      this.gameState.status,
       async () => {
         // 1. Both players generate the exact same next room code deterministically
         const oldRoomCode = this.gameState.roomCode;
