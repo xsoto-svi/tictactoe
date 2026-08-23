@@ -1,18 +1,96 @@
+.how-to-play-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px 24px;
+  background: var(--tile-cream);
+  border-radius: 20px;
+  box-shadow: 0 8px 0 var(--tile-shadow);
+  width: 90%;
+  max-width: 520px;
+  box-sizing: border-box;
+}
+
+/* Keep the title clean and well-proportioned */
+.how-to-play-wrapper .game-title {
+  font-size: 2.4rem !important;
+  margin-bottom: 14px !important;
+}
+
 .instructions-list {
   display: flex;
   flex-direction: column;
+  gap: 10px;
+  width: 100%;
+  margin-bottom: 16px;
+}
+
+.instruction-item {
+  display: flex;
+  align-items: flex-start;
   gap: 14px;
-  color: var(--text-main);
-  font-size: 0.95rem;
-  line-height: 1.4;
-  margin: 16px 0 32px 0;
+  background-color: var(--buttercream);
+  padding: 12px 16px; /* Comfortable padding */
+  border-radius: 14px;
+  box-shadow: 0 4px 0 var(--buttercream-shadow);
   text-align: left;
+}
+
+.instruction-number {
+  background-color: var(--chocolate);
+  color: var(--bg-cream);
+  font-family: 'Lilita One', 'Fredoka', sans-serif;
+  font-size: 1.1rem; /* Restored original size */
+  width: 30px;
+  height: 30px;
+  min-width: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  box-shadow: 0 3px 0 var(--chocolate-shadow);
+  margin-top: 2px;
+}
+
+.instruction-content {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
   width: 100%;
 }
 
-.instructions-list p {
+.instruction-header-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.instruction-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--chocolate);
+}
+
+.instruction-icon svg {
+  width: 20px;
+  height: 20px;
+  stroke: var(--chocolate);
+}
+
+/* Restored comfortable text sizes */
+.instruction-subject {
+  font-family: 'Lilita One', 'Fredoka', sans-serif;
+  font-size: 1.15rem; 
+  color: var(--chocolate);
   margin: 0;
-  background: rgba(255, 255, 255, 0.4);
-  padding: 12px;
-  border-radius: 8px;
+}
+
+.instruction-desc {
+  font-family: 'Nunito', 'Fredoka', sans-serif;
+  font-size: 0.9rem; /* Restored original readable description size */
+  color: var(--text-main);
+  line-height: 1.35;
+  margin: 0;
+  font-weight: 600;
 }
