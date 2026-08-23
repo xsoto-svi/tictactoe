@@ -117,16 +117,18 @@ export class LobbyPage extends Page {
 
     this.createGameButton.addEventListener("click", async () => {
       // const roomCode = Math.random().toString(36).substring(2, 6).toUpperCase();
+      LoadingModal.showLoading("Connecting to server...", "Please wait...")
       const roomCode = "TEST";
-      LoadingModal.showLoading(
-        "Room Created",
-        `Waiting for opponent...`,
-        roomCode,
-        "Copy this code and share it with your friend!"
-      );
 
       try {
         const symbol = await this.tictactoeApi.createGame(roomCode);
+        LoadingModal.hideLoading();
+        LoadingModal.showLoading(
+          "Room Created",
+          `Waiting for opponent...`,
+          roomCode,
+          "Copy this code and share it with your friend!"
+        );
         this.gameState.joinRoom(roomCode, symbol);
 
         const checkInterval = setInterval(async () => {
@@ -139,6 +141,7 @@ export class LobbyPage extends Page {
           }
         }, 500);
       } catch (error) {
+        LoadingModal.hideLoading();
         const alertModal = new AlertModal("Network Error", "Could not create the game on the server.");
         alertModal.open();
       }
@@ -186,7 +189,7 @@ export class LobbyPage extends Page {
           alertModal.open();
         }
       } catch (error) {
-
+        LoadingModal.hideLoading();
         const alertModal = new AlertModal("Network Error", "Could not connect to the server.");
         alertModal.open();
       }
