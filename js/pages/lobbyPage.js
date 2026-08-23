@@ -34,7 +34,7 @@ export class LobbyPage extends Page {
     this.joinGameCard = document.createElement("div");
     this.joinGameHeading = document.createElement("h2");
     this.joinGameDescription = document.createElement("p");
-    this.joinGameInputWrapper = document.createElement("div");
+    this.joinGameForm = document.createElement("form");
     this.joinGameTextbox = document.createElement("input");
     this.joinGameButton = document.createElement("button");
 
@@ -67,12 +67,13 @@ export class LobbyPage extends Page {
     this.joinGameDescription.classList.add("card-desc");
     this.joinGameDescription.textContent = "Enter a 4-character code to join a friend.";
     
-    this.joinGameInputWrapper.classList.add("input-group");
+    this.joinGameForm.classList.add("input-group");
     this.joinGameTextbox.type = "text";
     this.joinGameTextbox.placeholder = "CODE";
     this.joinGameTextbox.maxLength = 4;
     this.joinGameTextbox.classList.add("code-input");
 
+    this.joinGameButton.type = "submit";
     this.joinGameButton.classList.add("btn", "btn-butter");
     this.joinGameButton.textContent = "Join";
 
@@ -91,11 +92,11 @@ export class LobbyPage extends Page {
     );
 
     // Assemble Join Card (Input and button wrapped nicely)
-    this.joinGameInputWrapper.append(this.joinGameTextbox, this.joinGameButton);
+    this.joinGameForm.append(this.joinGameTextbox, this.joinGameButton);
     this.joinGameCard.append(
       this.joinGameHeading,
       this.joinGameDescription,
-      this.joinGameInputWrapper
+      this.joinGameForm
     );
 
     // Assemble Cards Wrapper
@@ -157,42 +158,50 @@ export class LobbyPage extends Page {
       }
     });
 
-    this.joinGameButton.addEventListener("click", async () => {
-      const enteredCode = this.joinGameTextbox.value.replace(/\s/g, "");
-
-      if (enteredCode.length !== 4) {
-        const alertModal = new AlertModal("Invalid Input", "Please enter a valid 4-character code.");
-        alertModal.open();
-        return;
+    this.joinGameForm.addEventListener("submit", (event) => {
+      event.preventDefault();
+      const roomCode = this.joinGameTextbox.value.trim();
+      if (roomCode) {
+        this.onJoinSubmit(roomCode);
       }
-
-      LoadingModal.showLoading("Joining...", "Connecting to room...");
-
-      try {
-        const symbol = await this.tictactoeApi.createGame(enteredCode);
-
-        LoadingModal.hideLoading();
-
-        if (symbol === PlayerSymbol.X) {
-          // If we got "X", the room didn't exist and the server just made a new one
-          this.tictactoeApi.resetGame(enteredCode);
-          const alertModal = new AlertModal("Room Not Found", "Please check the code and try again.");
-          alertModal.open();
-          
-        } else if (symbol === PlayerSymbol.O) {
-          this.gameState.joinRoom(enteredCode, PlayerSymbol.O);
-          this.gameState.status = GameStatus.PLAYING;          
-          this.router.navigate(Router.Screens.GAME);
-        } else {
-
-          const alertModal = new AlertModal("Unable to Join", symbol);
-          alertModal.open();
-        }
-      } catch (error) {
-        LoadingModal.hideLoading();
-        const alertModal = new AlertModal("Network Error", "Could not connect to the server.");
-        alertModal.open();
-      }
-    });
+    })
   }
+
+  onJoinSubmit = async () => {
+    const enteredCode = this.joinGameTextbox.value.replace(/\s/g, "");
+
+    if (enteredCode.length !== 4) {
+      const alertModal = new AlertModal("Invalid Input", "Please enter a valid 4-character code.");
+      alertModal.open();
+      return;
+    }
+
+    LoadingModal.showLoading("Joining...", "Connecting to room...");
+
+    try {
+      const symbol = await this.tictactoeApi.createGame(enteredCode);
+
+      LoadingModal.hideLoading();
+
+      if (symbol === PlayerSymbol.X) {
+        // If we got "X", the room didn't exist and the server just made a new one
+        this.tictactoeApi.resetGame(enteredCode);
+        const alertModal = new AlertModal("Room Not Found", "Please check the code and try again.");
+        alertModal.open();
+        
+      } else if (symbol === PlayerSymbol.O) {
+        this.gameState.joinRoom(enteredCode, PlayerSymbol.O);
+        this.gameState.status = GameStatus.PLAYING;          
+        this.router.navigate(Router.Screens.GAME);
+      } else {
+
+        const alertModal = new AlertModal("Unable to Join", symbol);
+        alertModal.open();
+      }
+    } catch (error) {
+      LoadingModal.hideLoading();
+      const alertModal = new AlertModal("Network Error", "Could not connect to the server.");
+      alertModal.open();
+    }
+  };
 }
