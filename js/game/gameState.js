@@ -5,9 +5,14 @@ export class GameState {
     this.roomCode = null;
     this.symbol = null;
 
+    this.playerScore = 0;
+    this.opponentScore = 0;
+
     this.board = Array(9).fill("");
     this.status = GameStatus.WAITING;
     this.winner = null;
+
+    this.isScoreAlreadyUpdated = false;
   }
 
   joinRoom(roomCode, tile) {
@@ -34,10 +39,13 @@ export class GameState {
     if (this.board[index] === "" && this.status === GameStatus.PLAYING) {
       this.board[index] = this.symbol;
     }
-    this.evaluateGameStatus();
   }
 
   evaluateGameStatus() {
+    if (this.isScoreAlreadyUpdated) {
+      return;
+    }
+
     const winningLines = [
       [0, 1, 2],
       [3, 4, 5],
@@ -61,6 +69,14 @@ export class GameState {
 
         this.status = GameStatus.GAME_OVER;
 
+        if (this.symbol && this.winner === this.symbol) {
+          this.playerScore++;
+        } else {
+          this.opponentScore++;
+        }
+
+        this.isScoreAlreadyUpdated = true;
+
         return;
       }
     }
@@ -74,6 +90,12 @@ export class GameState {
     this.board = Array(9).fill("");
     this.status = GameStatus.PLAYING;
     this.winner = null;
+    this.isScoreAlreadyUpdated = false;
+  }
+
+  resetScore() {
+    this.playerScore = 0;
+    this.opponentScore = 0;
   }
 
   get isGameOver() {

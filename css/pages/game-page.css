@@ -1,3 +1,44 @@
+.score-board {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background-color: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  margin-bottom: 16px;
+  width: fit-content;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.score-card-item {
+  background-color: var(--buttercream);
+  padding: 8px 14px;
+  border-radius: 12px;
+  box-shadow: 0 4px 0 var(--buttercream-shadow);
+  font-family: 'Fredoka', 'Nunito', sans-serif;
+  font-weight: 700;
+  color: var(--chocolate);
+  font-size: 0.95rem;
+  letter-spacing: 0.5px;
+}
+
+.score-symbol-icon {
+  width: 28px;
+  height: 28px;
+  object-fit: contain;
+}
+
+.score-vs {
+  font-family: 'Lilita One', 'Fredoka', sans-serif;
+  font-size: 0.9rem;
+  color: var(--chocolate);
+  opacity: 0.6;
+  padding: 0 4px;
+}
+
 .status-bar {
   font-family: 'Fredoka', 'Nunito', sans-serif;
   background-color: var(--tile-cream);

@@ -1,6 +1,5 @@
 import { AlertModal } from "../components/modals/alertModal.js";
 import { LoadingModal } from "../components/modals/loadingModal.js";
-import { Modal } from "../components/modals/modal.js";
 import { GameStatus, PlayerSymbol } from "../game/gameConstants.js";
 import { Router } from "../router.js";
 import { Page } from "./page.js";

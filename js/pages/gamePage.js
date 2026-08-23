@@ -2,7 +2,6 @@ import { BoardComponent } from "../components/boardComponent.js";
 import { AlertModal } from "../components/modals/alertModal.js";
 import { ConfirmationModal } from "../components/modals/confirmationModal.js";
 import { LoadingModal } from "../components/modals/loadingModal.js";
-import { Modal } from "../components/modals/modal.js";
 import { ResetGameModal } from "../components/modals/resetGameModal.js";
 import { GameStatus, PlayerSymbol } from "../game/gameConstants.js";
 import { Router } from "../router.js";
@@ -31,12 +30,34 @@ export class GamePage extends Page {
   }
 
   initializeElements() {
+    this.scoreBoard = document.createElement("div");
+
+    this.playerIcon = document.createElement("img");
+    this.playerScoreCard = document.createElement("div");
+    this.playersScore = document.createElement("span");
+
+    this.vsDivider = document.createElement("span");
+    
+    this.opponentScoreCard = document.createElement("div");
+    this.opponentsScore = document.createElement("span");
+    this.opponentIcon = document.createElement("img");
+
     this.gameStatusBar = document.createElement("div");
     this.errorStatusBar = document.createElement("div");
     this.leaveButton = document.createElement("button");
   }
 
   setAttributes() {
+    this.scoreBoard.classList.add("score-board");
+    this.playerScoreCard.classList.add("score-card-item");
+    this.opponentScoreCard.classList.add("score-card-item");
+    
+    this.playerIcon.classList.add("score-symbol-icon");
+    this.opponentIcon.classList.add("score-symbol-icon");
+
+    this.vsDivider.classList.add("score-vs");
+    this.vsDivider.textContent = "VS";
+
     this.gameStatusBar.classList.add("status-bar");
     this.errorStatusBar.classList.add("error-bar");
     this.errorStatusBar.textContent = "";
@@ -45,10 +66,24 @@ export class GamePage extends Page {
     this.leaveButton.textContent = "Leave Game";
     this.leaveButton.style.marginTop = "20px";
     this.leaveButton.style.maxWidth = "200px";
+
+    this.updateScoreDisplay();
   }
 
   appendElements() {
+    this.playerScoreCard.append(this.playersScore);
+    this.opponentScoreCard.append(this.opponentsScore);
+
+    this.scoreBoard.append(
+      this.playerIcon,
+      this.playerScoreCard,
+      this.vsDivider,
+      this.opponentScoreCard,
+      this.opponentIcon
+    );
+
     this.pageWrapper.append(
+      this.scoreBoard,
       this.gameStatusBar,
       this.errorStatusBar,
       this.gameBoard.getHTML(),
@@ -57,13 +92,8 @@ export class GamePage extends Page {
   }
 
   attachEvents() {
-    // When a player leaves
     window.addEventListener("beforeunload", () => {
-      if (this.gameState.roomCode) {
-        this.tictactoeApi.resetGame(this.gameState.roomCode, {
-          keepalive: true,
-        });
-      }
+      this.handleLeaveGame(this.gameState.roomCode);
     });
 
     this.leaveButton.addEventListener("click", () => {
@@ -72,7 +102,7 @@ export class GamePage extends Page {
         "Leave Game?",
         "Are you sure you want to quit? This will forfeit the match.",
         () => {
-          this.handleLeaveGame();
+          this.handleLeaveGame(this.gameState.roomCode);
         },
         () => {
         }
@@ -83,15 +113,28 @@ export class GamePage extends Page {
     this.startGamePoll();
   }
 
-  handleLeaveGame() {
+  handleLeaveGame(roomCode) {
     this.stopAllPolls();
 
-    
-    if (this.gameState.roomCode) {
-      this.tictactoeApi.resetGame(this.gameState.roomCode).catch(() => {});
+    if (roomCode) {
+      this.tictactoeApi.resetGame(roomCode).catch(() => {});
     }
 
+    this.gameState.resetScore();
+
     this.router.navigate(Router.Screens.HOME, "back");    
+  }
+
+  updateScoreDisplay() {
+    this.playersScore.textContent = `Player: ${this.gameState.playerScore}`;
+    this.opponentsScore.textContent = `Opponent: ${this.gameState.opponentScore}`;
+
+    const opponentSymbol = this.gameState.symbol === PlayerSymbol.X ? PlayerSymbol.O : PlayerSymbol.X;
+
+    if (this.gameState.symbol) {
+      this.playerIcon.src = this.gameState.symbol === PlayerSymbol.X ? "../assets/x-icon.svg" : "../assets/o-icon.svg";
+      this.opponentIcon.src = opponentSymbol === PlayerSymbol.X ? "../assets/x-icon.svg" : "../assets/o-icon.svg";
+    }
   }
 
   async onCellClick(index) {
@@ -160,6 +203,8 @@ export class GamePage extends Page {
       this.gameStatusBar.textContent = "It's a draw!";
     }
 
+    this.updateScoreDisplay();
+
     this.gameState.board.forEach((symbol, index) => {
       this.gameBoard.updateCell(index, symbol);
     });
@@ -174,7 +219,7 @@ export class GamePage extends Page {
     this.toastTimeout = setTimeout(() => {
       this.errorStatusBar.textContent = "";
       this.errorStatusBar.classList.remove("show");
-    }, 2500); // Disappears after 2.5 seconds
+    }, 2500);
   }
 
   showGameOverModal() {
@@ -210,8 +255,7 @@ export class GamePage extends Page {
       () => {
         // Only destroy the room if someone explicitly clicks "Leave"
         this.isGameOverModalPresent = false;
-        this.tictactoeApi.resetGame(this.gameState.roomCode);
-        this.router.navigate(Router.Screens.HOME);
+        this.handleLeaveGame(this.gameState.roomCode);
       }
     );
 
@@ -238,6 +282,7 @@ export class GamePage extends Page {
 
           this.gameState.joinRoom(nextRoomCode, newAssignedSymbol);
 
+          this.updateScoreDisplay();
           this.updateUI();
           this.startGamePoll();
           return;
@@ -248,15 +293,10 @@ export class GamePage extends Page {
         
         if (oldRoomData === "[GAME NOT YET STARTED]") {
           // THE OPPONENT LEFT!
-          this.stopAllPolls();
           LoadingModal.hideLoading();
-          
-          // Clean up the new room so it doesn't stay abandoned on the server
-          this.tictactoeApi.resetGame(nextRoomCode).catch(() => {}); 
-          
+          this.handleLeaveGame(nextRoomCode); // Clean up the new room so it doesn't stay abandoned on the server
           const alert = new AlertModal("Game Over", "Your opponent left the game.");
           alert.open();
-          this.router.navigate(Router.Screens.HOME);
           return;
         }
 
@@ -278,12 +318,10 @@ export class GamePage extends Page {
         const boardData = await this.tictactoeApi.boardStatus(this.gameState.roomCode);
 
         if (boardData === "[GAME NOT YET STARTED]") {
-          this.stopAllPolls();
-          
           const alertModal = new AlertModal("Game Over", "Your opponent left the game.");
           alertModal.open();
+          this.handleLeaveGame();
 
-          this.router.navigate(Router.Screens.HOME);
           return;
         }
 
@@ -297,13 +335,9 @@ export class GamePage extends Page {
         this.updateUI();
 
       } catch (error) {
-        console.log("error:", error);
-        this.stopAllPolls();
-        
         const alertModal = new AlertModal("Game Disconnected", "The room was closed.");
         alertModal.open();
-        this.tictactoeApi.resetGame(this.gameState.roomCode).catch(() => {});
-        this.router.navigate(Router.Screens.HOME);
+        this.handleLeaveGame(this.gameState.roomCode);
       }
     }, 500);
   }
