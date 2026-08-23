@@ -142,10 +142,15 @@ export class GamePage extends Page {
   updateUI() {
     if (this.gameState.status === GameStatus.WAITING) {
       this.gameStatusBar.textContent = "Waiting for opponent...";
+      this.gameStatusBar.classList.remove("my-turn");   
     } else if (this.gameState.status === GameStatus.PLAYING) {
-      this.gameStatusBar.textContent = this.gameState.isMyTurn 
-        ? "It's your turn" 
-        : "Opponent's turn...";
+      if (this.gameState.isMyTurn) {
+        this.gameStatusBar.textContent = "It's your turn! 🎮";
+        this.gameStatusBar.classList.add("my-turn");
+      } else {
+        this.gameStatusBar.textContent = "Opponent's turn...";
+        this.gameStatusBar.classList.remove("my-turn");
+      }
     } else if (this.gameState.status === GameStatus.GAME_OVER) {
 
       this.gameStatusBar.textContent = this.gameState.winner === this.gameState.symbol 

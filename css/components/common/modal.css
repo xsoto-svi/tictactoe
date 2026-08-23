@@ -45,7 +45,6 @@
 .modal-content p, 
 .status-message {
   color: var(--text-muted);
-  font-family: 'Nunito', sans-serif;
   font-size: 1rem;
   font-weight: 700;
   margin: 0 0 24px 0;

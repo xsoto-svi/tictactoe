@@ -1,16 +1,29 @@
 .status-bar {
-  font-family: 'Nunito', 'Fredoka', sans-serif;
+  font-family: 'Fredoka', 'Nunito', sans-serif;
   background-color: var(--tile-cream);
   border: 2px solid var(--tile-shadow);
   color: var(--chocolate);
   font-weight: 700;
-  font-size: 1rem;
-  padding: 10px 20px;
-  border-radius: 12px;
-  margin-bottom: 12px;
+  font-size: 1.1rem;
+  padding: 12px 24px;
+  border-radius: 14px;
+  margin-bottom: 8px;
   text-align: center;
-  min-width: 200px;
+  min-width: 220px;
   box-shadow: 0 4px 0 var(--tile-shadow);
+  transition: all 0.2s ease;
+}
+
+.status-bar.my-turn {
+  background-color: #fde8cd;
+  border-color: var(--chocolate);
+  animation: turnPulse 1.5s infinite ease-in-out;
+}
+
+@keyframes turnPulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.02); box-shadow: 0 6px 0 var(--tile-shadow); }
+  100% { transform: scale(1); }
 }
 
 .error-bar {

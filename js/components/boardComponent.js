@@ -24,13 +24,13 @@ export class BoardComponent extends Component {
 
   setAttributes() {
     this.board.classList.add("board");
-    this.cells.forEach(cell => {
-      this.board.append(cell.getHTML());
-    });
   }
 
   appendElements() {
     this.componentContainer.append(this.board);
+    this.cells.forEach(cell => {
+      this.board.append(cell.getHTML());
+    });
   }
 
   updateCell(index, symbol) {
