@@ -1,5 +1,6 @@
 import { BoardComponent } from "../components/boardComponent.js";
 import { AlertModal } from "../components/modals/alertModal.js";
+import { ConfirmationModal } from "../components/modals/confirmationModal.js";
 import { LoadingModal } from "../components/modals/loadingModal.js";
 import { Modal } from "../components/modals/modal.js";
 import { ResetGameModal } from "../components/modals/resetGameModal.js";
@@ -30,11 +31,18 @@ export class GamePage extends Page {
   initializeElements() {
     this.gameStatusBar = document.createElement("div");
     this.errorStatusBar = document.createElement("div");
+    this.leaveButton = document.createElement("button");
   }
 
   setAttributes() {
     this.gameStatusBar.classList.add("status-bar");
-    this.errorStatusBar.classList.add("error-bar")
+    this.errorStatusBar.classList.add("error-bar");
+    this.errorStatusBar.textContent = "";
+
+    this.leaveButton.classList.add("btn", "btn-butter");
+    this.leaveButton.textContent = "Leave Game";
+    this.leaveButton.style.marginTop = "20px";
+    this.leaveButton.style.maxWidth = "200px";
   }
 
   appendElements() {
@@ -42,6 +50,7 @@ export class GamePage extends Page {
       this.gameStatusBar,
       this.errorStatusBar,
       this.gameBoard.getHTML(),
+      this.leaveButton
     );
   }
 
@@ -55,19 +64,32 @@ export class GamePage extends Page {
       }
     });
 
+    this.leaveButton.addEventListener("click", () => {
+      const confirmModal = new ConfirmationModal(
+        document.body,
+        "Leave Game?",
+        "Are you sure you want to quit? This will forfeit the match.",
+        () => {
+          this.handleLeaveGame();
+        },
+        () => {
+        }
+      );
+      confirmModal.open();
+    });
+
     this.startGamePoll();
   }
 
-  showErrorToast(message) {
-    this.errorStatusBar.textContent = message;
-    this.errorStatusBar.classList.add("show");
+  handleLeaveGame() {
+    this.stopAllPolls();
 
-    if (this.toastTimeout) clearTimeout(this.toastTimeout);
+    
+    if (this.gameState.roomCode) {
+      this.tictactoeApi.resetGame(this.gameState.roomCode).catch(() => {});
+    }
 
-    this.toastTimeout = setTimeout(() => {
-      this.errorStatusBar.textContent = "";
-      this.errorStatusBar.classList.remove("show");
-    }, 2500); // Disappears after 2.5 seconds
+    this.router.navigate(Router.Screens.HOME, "back");    
   }
 
   async onCellClick(index) {
@@ -136,6 +158,18 @@ export class GamePage extends Page {
     this.gameState.board.forEach((symbol, index) => {
       this.gameBoard.updateCell(index, symbol);
     });
+  }
+
+  showErrorToast(message) {
+    this.errorStatusBar.textContent = message;
+    this.errorStatusBar.classList.add("show");
+
+    if (this.toastTimeout) clearTimeout(this.toastTimeout);
+
+    this.toastTimeout = setTimeout(() => {
+      this.errorStatusBar.textContent = "";
+      this.errorStatusBar.classList.remove("show");
+    }, 2500); // Disappears after 2.5 seconds
   }
 
   createGameOverModal() {
