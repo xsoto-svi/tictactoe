@@ -16,9 +16,8 @@ export class Router {
     BACKWARD: "back"
   }
 
-  constructor(appContainer, routes = {}, tictactoeApi, gameState) {
+  constructor(appContainer, tictactoeApi, gameState) {
     this.appContainer = appContainer;
-    this.routes = routes;
     this.tictactoeApi = tictactoeApi;
     this.gameState = gameState;
 

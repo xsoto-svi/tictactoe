@@ -11,12 +11,4 @@ const appContainer = document.querySelector("#app");
 const tictactoeApi = new TicTacToeApi();
 const gameState = new GameState();
 
-const routes = {
-  "/": HomePage,
-  "/how-to-play": HowToPlayPage,
-  "/lobby": LobbyPage,
-  "/room": RoomPage,
-  "/game": GamePage
-}
-
-const router = new Router(appContainer, routes, tictactoeApi, gameState);
+const router = new Router(appContainer, tictactoeApi, gameState);
