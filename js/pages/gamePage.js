@@ -264,17 +264,19 @@ export class GamePage extends Page {
   startRematchPoll(oldRoomCode, nextRoomCode, newAssignedSymbol) {
     this.stopAllPolls();
 
-    this.rematchInterval = setInterval(async () => {
-      try {
+    let isPollingInProgress = false;
 
-        // Check if new room is ready
+    const poll = async () => {
+      if (isPollingInProgress) return;
+      isPollingInProgress = true;
+
+      try {
         const isNextRoomReady = await this.tictactoeApi.checkRoomStatus(nextRoomCode);
         
         if (isNextRoomReady === "true") {
           this.stopAllPolls();
           LoadingModal.hideLoading();
           
-          // clean-up previous rooms
           if (this.gameState.symbol === PlayerSymbol.O) {
             this.tictactoeApi.resetGame(oldRoomCode).catch(() => {});
           }
@@ -292,6 +294,7 @@ export class GamePage extends Page {
         
         if (oldRoomData === "[GAME NOT YET STARTED]") {
           // THE OPPONENT LEFT!
+          this.stopAllPolls();
           LoadingModal.hideLoading();
           this.handleLeaveGame(nextRoomCode); // Clean up the new room so it doesn't stay abandoned on the server
           const alert = new AlertModal("Game Over", "Your opponent left the game.");
@@ -305,22 +308,34 @@ export class GamePage extends Page {
         const alertModal = new AlertModal("Game Error" , "Connection lost.");
         alertModal.open();
         this.router.navigate(Router.Screens.HOME);
+        return;
+      } finally {
+        isPollingInProgress = false;
       }
-    }, 1000);
+
+      this.rematchInterval = setTimeout(poll, 1000);
+    };
+
+    poll();
   }
 
   startGamePoll() {
     this.stopAllPolls();
 
-    this.gameInterval = setInterval(async () => {
+    let isPollingInProgress = false;
+
+    const poll = async () => {
+      if (isPollingInProgress) return;
+      isPollingInProgress = true;
+
       try {
         const boardData = await this.tictactoeApi.boardStatus(this.gameState.roomCode);
 
         if (boardData === "[GAME NOT YET STARTED]") {
+          this.stopAllPolls();
           const alertModal = new AlertModal("Game Over", "Your opponent left the game.");
           alertModal.open();
           this.handleLeaveGame();
-
           return;
         }
 
@@ -329,20 +344,35 @@ export class GamePage extends Page {
         if (this.gameState.isGameOver) {
           this.stopAllPolls();
           this.showGameOverModal();
+          return;
         }
 
         this.updateUI();
 
       } catch (error) {
+        this.stopAllPolls();
         const alertModal = new AlertModal("Game Disconnected", "The room was closed.");
         alertModal.open();
         this.handleLeaveGame(this.gameState.roomCode);
+        return;
+      } finally {
+        isPollingInProgress = false;
       }
-    }, 500);
+
+      this.gameInterval = setTimeout(poll, 500);
+    };
+
+    poll();
   }
 
   stopAllPolls() {
-    if (this.gameInterval) clearInterval(this.gameInterval);
-    if (this.rematchInterval) clearInterval(this.rematchInterval);
+    if (this.gameInterval) {
+      clearTimeout(this.gameInterval);
+      this.gameInterval = null;
+    }
+    if (this.rematchInterval) {
+      clearTimeout(this.rematchInterval);
+      this.rematchInterval = null;
+    }
   }
 }
