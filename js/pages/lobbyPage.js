@@ -192,8 +192,7 @@ export class LobbyPage extends Page {
         this.gameState.status = GameStatus.PLAYING;          
         this.router.navigate(Router.Screens.GAME);
       } else {
-
-        const alertModal = new AlertModal("Unable to Join", symbol);
+        const alertModal = new AlertModal("Unable to Join", "Game is already full.");
         alertModal.open();
       }
     } catch (error) {
