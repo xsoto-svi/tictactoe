@@ -37,7 +37,7 @@ export class GamePage extends Page {
     this.playersScore = document.createElement("span");
 
     this.vsDivider = document.createElement("span");
-    
+
     this.opponentScoreCard = document.createElement("div");
     this.opponentsScore = document.createElement("span");
     this.opponentIcon = document.createElement("img");
@@ -51,7 +51,7 @@ export class GamePage extends Page {
     this.scoreBoard.classList.add("score-board");
     this.playerScoreCard.classList.add("score-card-item");
     this.opponentScoreCard.classList.add("score-card-item");
-    
+
     this.playerIcon.classList.add("score-symbol-icon");
     this.opponentIcon.classList.add("score-symbol-icon");
 
@@ -79,7 +79,7 @@ export class GamePage extends Page {
       this.playerScoreCard,
       this.vsDivider,
       this.opponentScoreCard,
-      this.opponentIcon
+      this.opponentIcon,
     );
 
     this.pageWrapper.append(
@@ -87,7 +87,7 @@ export class GamePage extends Page {
       this.gameStatusBar,
       this.errorStatusBar,
       this.gameBoard.getHTML(),
-      this.leaveButton
+      this.leaveButton,
     );
   }
 
@@ -104,8 +104,7 @@ export class GamePage extends Page {
         () => {
           this.handleLeaveGame(this.gameState.roomCode);
         },
-        () => {
-        }
+        () => {},
       );
       confirmModal.open();
     });
@@ -122,18 +121,27 @@ export class GamePage extends Page {
 
     this.gameState.resetScore();
 
-    this.router.navigate(Router.Screens.HOME, "back");    
+    this.router.navigate(Router.Screens.HOME, "back");
   }
 
   updateScoreDisplay() {
     this.playersScore.textContent = `Player: ${this.gameState.playerScore}`;
     this.opponentsScore.textContent = `Opponent: ${this.gameState.opponentScore}`;
 
-    const opponentSymbol = this.gameState.symbol === PlayerSymbol.X ? PlayerSymbol.O : PlayerSymbol.X;
+    const opponentSymbol =
+      this.gameState.symbol === PlayerSymbol.X
+        ? PlayerSymbol.O
+        : PlayerSymbol.X;
 
     if (this.gameState.symbol) {
-      this.playerIcon.src = this.gameState.symbol === PlayerSymbol.X ? "../assets/x-icon.svg" : "../assets/o-icon.svg";
-      this.opponentIcon.src = opponentSymbol === PlayerSymbol.X ? "../assets/x-icon.svg" : "../assets/o-icon.svg";
+      this.playerIcon.src =
+        this.gameState.symbol === PlayerSymbol.X
+          ? "../assets/x-icon.svg"
+          : "../assets/o-icon.svg";
+      this.opponentIcon.src =
+        opponentSymbol === PlayerSymbol.X
+          ? "../assets/x-icon.svg"
+          : "../assets/o-icon.svg";
     }
   }
 
@@ -170,11 +178,9 @@ export class GamePage extends Page {
         if (this.gameState.isGameOver) {
           this.showGameOverModal();
         }
-
       } else {
         this.showErrorToast("That space is already taken!");
       }
-      
     } catch (error) {
       this.showErrorToast("Network Error: Failed to send move.");
     } finally {
@@ -185,7 +191,7 @@ export class GamePage extends Page {
   updateUI() {
     if (this.gameState.status === GameStatus.WAITING) {
       this.gameStatusBar.textContent = "Waiting for opponent...";
-      this.gameStatusBar.classList.remove("my-turn");   
+      this.gameStatusBar.classList.remove("my-turn");
     } else if (this.gameState.status === GameStatus.PLAYING) {
       if (this.gameState.isMyTurn) {
         this.gameStatusBar.textContent = "It's your turn! 🎮";
@@ -195,9 +201,10 @@ export class GamePage extends Page {
         this.gameStatusBar.classList.remove("my-turn");
       }
     } else if (this.gameState.status === GameStatus.GAME_OVER) {
-      this.gameStatusBar.textContent = this.gameState.winner === this.gameState.symbol 
-        ? "You Won! 🎉" 
-        : "You Lost!";
+      this.gameStatusBar.textContent =
+        this.gameState.winner === this.gameState.symbol
+          ? "You Won! 🎉"
+          : "You Lost!";
     } else if (this.gameState.status === GameStatus.DRAW) {
       this.gameStatusBar.textContent = "It's a draw!";
     }
@@ -236,12 +243,13 @@ export class GamePage extends Page {
       async () => {
         // Both players generate the exact same next room code deterministically
         const oldRoomCode = this.gameState.roomCode;
-        const nextRoomCode = this.gameState.roomCode + "R"; 
+        const nextRoomCode = this.gameState.roomCode + "R";
 
         LoadingModal.showLoading("Joining...", "Setting up the rematch.");
 
         try {
-          const newAssignedSymbol = await this.tictactoeApi.createGame(nextRoomCode);
+          const newAssignedSymbol =
+            await this.tictactoeApi.createGame(nextRoomCode);
           this.startRematchPoll(oldRoomCode, nextRoomCode, newAssignedSymbol);
         } catch (error) {
           LoadingModal.hideLoading();
@@ -255,7 +263,7 @@ export class GamePage extends Page {
         // Only destroy the room if someone explicitly clicks "Leave"
         this.isGameOverModalPresent = false;
         this.handleLeaveGame(this.gameState.roomCode);
-      }
+      },
     );
 
     resetGameModal.open();
@@ -271,12 +279,13 @@ export class GamePage extends Page {
       isPollingInProgress = true;
 
       try {
-        const isNextRoomReady = await this.tictactoeApi.checkRoomStatus(nextRoomCode);
-        
+        const isNextRoomReady =
+          await this.tictactoeApi.checkRoomStatus(nextRoomCode);
+
         if (isNextRoomReady === "true") {
           this.stopAllPolls();
           LoadingModal.hideLoading();
-          
+
           if (this.gameState.symbol === PlayerSymbol.O) {
             this.tictactoeApi.resetGame(oldRoomCode).catch(() => {});
           }
@@ -291,21 +300,23 @@ export class GamePage extends Page {
 
         // Check if the opponent left the old room
         const oldRoomData = await this.tictactoeApi.boardStatus(oldRoomCode);
-        
+
         if (oldRoomData === "[GAME NOT YET STARTED]") {
           // THE OPPONENT LEFT!
           this.stopAllPolls();
           LoadingModal.hideLoading();
           this.handleLeaveGame(nextRoomCode); // Clean up the new room so it doesn't stay abandoned on the server
-          const alert = new AlertModal("Game Over", "Your opponent left the game.");
+          const alert = new AlertModal(
+            "Game Over",
+            "Your opponent left the game.",
+          );
           alert.open();
           return;
         }
-
       } catch (error) {
         this.stopAllPolls();
         LoadingModal.hideLoading();
-        const alertModal = new AlertModal("Game Error" , "Connection lost.");
+        const alertModal = new AlertModal("Game Error", "Connection lost.");
         alertModal.open();
         this.router.navigate(Router.Screens.HOME);
         return;
@@ -329,18 +340,23 @@ export class GamePage extends Page {
       isPollingInProgress = true;
 
       try {
-        const boardData = await this.tictactoeApi.boardStatus(this.gameState.roomCode);
+        const boardData = await this.tictactoeApi.boardStatus(
+          this.gameState.roomCode,
+        );
 
         if (boardData === "[GAME NOT YET STARTED]") {
           this.stopAllPolls();
-          const alertModal = new AlertModal("Game Over", "Your opponent left the game.");
+          const alertModal = new AlertModal(
+            "Game Over",
+            "Your opponent left the game.",
+          );
           alertModal.open();
           this.handleLeaveGame();
           return;
         }
 
         this.gameState.syncWithServer(boardData);
-      
+
         if (this.gameState.isGameOver) {
           this.stopAllPolls();
           this.showGameOverModal();
@@ -348,10 +364,12 @@ export class GamePage extends Page {
         }
 
         this.updateUI();
-
       } catch (error) {
         this.stopAllPolls();
-        const alertModal = new AlertModal("Game Disconnected", "The room was closed.");
+        const alertModal = new AlertModal(
+          "Game Disconnected",
+          "The room was closed.",
+        );
         alertModal.open();
         this.handleLeaveGame(this.gameState.roomCode);
         return;
