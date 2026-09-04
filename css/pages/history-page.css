@@ -1,0 +1,151 @@
+.history-layout {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 90%;
+  max-width: 520px; /* matched to how-to-play page width */
+  max-height: 90vh;
+}
+
+.history-tabs-top {
+  display: flex;
+  justify-content: flex-start;
+  gap: 8px;
+  padding-left: 20px;
+  margin-bottom: -15px; /* overlap with card */
+  width: 100%;
+  box-sizing: border-box;
+  position: relative;
+  z-index: 1;
+  flex-shrink: 0;
+}
+
+.history-tab {
+  background-color: var(--buttercream);
+  color: var(--chocolate);
+  border: none;
+  border-radius: 16px 16px 0 0;
+  padding: 12px 24px 20px 24px;
+  font-family: "Fredoka", sans-serif;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-transform: uppercase;
+  transition: all 0.2s;
+  box-shadow: inset 0 -4px 0 rgba(0, 0, 0, 0.05);
+  position: relative;
+}
+
+.history-tab.active-tab {
+  background-color: var(--tile-cream);
+  box-shadow: none;
+  padding-top: 16px;
+  padding-bottom: 25px; /* overlap past the card's top edge */
+  z-index: 3; /* draw above the card to hide its top shadow/border */
+}
+
+.history-card {
+  width: 100%;
+  position: relative;
+  z-index: 2;
+  overflow: hidden; /* for inner transition */
+  padding-bottom: 24px;
+  flex: 1;
+  min-height: 0;
+}
+
+.history-header {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 20px;
+  width: 100%;
+}
+
+.history-layout .game-title {
+  font-size: 2.4rem !important;
+  margin-bottom: 14px !important;
+}
+
+.history-title {
+  margin: 0;
+}
+
+.history-list-viewport {
+  width: 100%;
+  background-color: transparent;
+  padding: 0 12px;
+  box-sizing: border-box;
+  overflow: hidden;
+  position: relative;
+  flex: 1;
+  min-height: 150px;
+}
+
+.history-list {
+  max-height: 100%;
+  height: 100%;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+  /* hide scrollbar for cleaner look */
+  scrollbar-width: thin;
+}
+
+.history-loading {
+  text-align: center;
+  display: none;
+  font-weight: 600;
+  color: var(--chocolate);
+}
+
+.history-empty {
+  text-align: center;
+  color: var(--text-muted);
+}
+
+.history-error {
+  text-align: center;
+  color: #d9534f;
+}
+
+.history-move-card {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 16px;
+  border: 2px solid var(--buttercream-shadow);
+  border-radius: 12px;
+  background-color: var(--buttercream);
+  text-align: left;
+  box-shadow: 0 4px 0 var(--buttercream-shadow);
+}
+
+.history-move-symbol {
+  font-family: "Titan One", "Lilita One", sans-serif;
+  font-size: 2rem;
+  width: 40px;
+  text-align: center;
+}
+
+.history-move-details {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 0.95rem;
+  color: var(--text-main);
+}
+
+.hide {
+  display: none !important;
+}
+
+.show-block {
+  display: block !important;
+}
+
+.show-flex {
+  display: flex !important;
+}

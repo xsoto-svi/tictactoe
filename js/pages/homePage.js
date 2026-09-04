@@ -1,5 +1,5 @@
 import { Router } from "../router.js";
-import { Page } from "./page.js"
+import { Page } from "./page.js";
 
 export class HomePage extends Page {
   constructor(appContainer, router) {
@@ -19,17 +19,18 @@ export class HomePage extends Page {
     this.menuContainer = document.createElement("div");
     this.startButton = document.createElement("button");
     this.howToPlayButton = document.createElement("button");
+    this.historyButton = document.createElement("button");
   }
 
   setAttributes() {
     this.cardContainer.classList.add("tile-card");
-    
+
     this.title.classList.add("game-title");
     this.title.textContent = "Tic-Tac-Toe";
 
     this.subtitle.classList.add("game-subtitle");
     this.subtitle.textContent = "The classic X and O game of strategy and fun.";
-    
+
     this.menuContainer.classList.add("btn-group");
 
     this.startButton.classList.add("btn", "btn-chocolate");
@@ -37,16 +38,19 @@ export class HomePage extends Page {
 
     this.howToPlayButton.classList.add("btn", "btn-butter");
     this.howToPlayButton.textContent = "How To Play";
+
+    this.historyButton.classList.add("btn", "btn-butter");
+    this.historyButton.textContent = "Match History";
   }
 
   appendElements() {
-    this.menuContainer.append(this.startButton, this.howToPlayButton);
+    this.menuContainer.append(
+      this.startButton,
+      this.howToPlayButton,
+      this.historyButton,
+    );
 
-    this.cardContainer.append(
-      this.title,
-      this.subtitle,
-      this.menuContainer
-    )
+    this.cardContainer.append(this.title, this.subtitle, this.menuContainer);
 
     this.pageWrapper.append(this.cardContainer);
   }
@@ -58,6 +62,10 @@ export class HomePage extends Page {
 
     this.howToPlayButton.addEventListener("click", () => {
       this.router.navigate(Router.Screens.HOW_TO_PLAY);
+    });
+
+    this.historyButton.addEventListener("click", () => {
+      this.router.navigate(Router.Screens.HISTORY);
     });
   }
 }

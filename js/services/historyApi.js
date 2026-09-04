@@ -7,7 +7,7 @@ export class HistoryApi extends ApiClient {
 
   // Placeholder APIs for History
   getAllRooms() {
-    return this.get(`/rooms`);
+    return this.get(`/room/all`);
   }
 
   getAllPlayers() {
