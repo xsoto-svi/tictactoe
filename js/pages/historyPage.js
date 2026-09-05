@@ -33,7 +33,10 @@ export class HistoryPage extends Page {
     this.cardContainer = document.createElement("div");
 
     this.headerContainer = document.createElement("div");
+    this.titleRow = document.createElement("div");
     this.title = document.createElement("h1");
+    this.subtitle = document.createElement("p");
+    this.smallBackButton = document.createElement("button");
 
     this.listComponent = new HistoryListComponent((action) => {
       if (action.type === "ENTITY") {
@@ -48,11 +51,18 @@ export class HistoryPage extends Page {
 
   setAttributes() {
     this.layoutContainer.classList.add("history-layout");
-    this.cardContainer.classList.add("tile-card", "history-card");
+    this.cardContainer.classList.add("history-card");
     this.headerContainer.classList.add("history-header");
+    this.titleRow.classList.add("history-title-row");
 
     this.title.classList.add("game-title", "history-title");
     this.title.textContent = "MATCH HISTORY";
+
+    this.subtitle.classList.add("history-subtitle");
+    this.subtitle.textContent = "ROOMS";
+
+    this.smallBackButton.classList.add("history-small-back-btn", "hide");
+    this.smallBackButton.innerHTML = `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>`;
 
     this.backButton.classList.add("btn", "btn-butter", "history-back-btn");
     this.backButton.style.maxWidth = "200px";
@@ -60,11 +70,9 @@ export class HistoryPage extends Page {
   }
 
   appendElements() {
-    this.headerContainer.append(this.title);
+    this.titleRow.append(this.smallBackButton, this.title);
+    this.headerContainer.append(this.titleRow, this.subtitle);
 
-    // Manually order children in cardContainer since components append directly
-    // listComponent is already appended to cardContainer in its constructor.
-    // Let's reorder header to be first:
     this.cardContainer.prepend(
       this.headerContainer,
       this.listComponent.getHTML(),
@@ -80,26 +88,32 @@ export class HistoryPage extends Page {
 
   attachEvents() {
     this.backButton.addEventListener("click", () => {
+      this.router.navigate(Router.Screens.HOME, "back");
+    });
+
+    this.smallBackButton.addEventListener("click", () => {
       this.listComponent.triggerTransition("backward");
 
       if (this.currentView === "DETAILS") {
         this.currentView = "GAMES";
+        this.subtitle.textContent = this.tabsComponent.activeTab === "ROOMS" ? `ROOM: ${this.lastSelectedEntity}` : `PLAYER: ${this.lastSelectedEntity}`;
         this.listComponent.renderGames(
           this.lastGamesData,
           this.lastSelectedEntity,
         );
       } else if (this.currentView === "GAMES") {
         this.currentView = "TABS";
+        this.smallBackButton.classList.add("hide");
         this.tabsComponent.show();
         this.loadActiveTab(this.tabsComponent.activeTab);
-      } else {
-        this.router.navigate(Router.Screens.HOME, "back");
       }
     });
   }
 
   async loadActiveTab(tabName) {
     this.tabsComponent.show();
+    this.smallBackButton.classList.add("hide");
+    this.subtitle.classList.add("hide");
 
     this.listComponent.renderMessage("Loading...");
     try {
@@ -112,7 +126,7 @@ export class HistoryPage extends Page {
       this.listComponent.renderEntities(data);
     } catch (e) {
       this.listComponent.renderMessage(
-        "Failed to load data. The API endpoints might not be implemented yet.",
+        "Failed to load data.",
         true,
       );
     }
@@ -121,6 +135,9 @@ export class HistoryPage extends Page {
   async loadGamesForEntity(entityId) {
     this.currentView = "GAMES";
     this.tabsComponent.hide();
+    this.smallBackButton.classList.remove("hide");
+    this.subtitle.classList.remove("hide");
+    this.subtitle.textContent = this.tabsComponent.activeTab === "ROOMS" ? `ROOM: ${entityId}` : `PLAYER: ${entityId}`;
 
     this.listComponent.renderMessage("Loading...");
     try {
@@ -143,6 +160,9 @@ export class HistoryPage extends Page {
 
   async loadGameDetails(gameId) {
     this.currentView = "DETAILS";
+    this.smallBackButton.classList.remove("hide");
+    this.subtitle.classList.remove("hide");
+    this.subtitle.textContent = `GAME: ${gameId}`;
 
     this.listComponent.renderMessage("Loading...");
     try {

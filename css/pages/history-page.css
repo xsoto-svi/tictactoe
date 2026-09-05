@@ -45,30 +45,87 @@
 }
 
 .history-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 24px; /* Based on how-to-play-wrapper padding */
+  background: var(--tile-cream);
+  border-radius: 20px;
+  box-shadow: 0 8px 0 var(--tile-shadow);
+  box-sizing: border-box;
+
   width: 100%;
   position: relative;
   z-index: 2;
   overflow: hidden; /* for inner transition */
-  padding-bottom: 24px;
   flex: 1;
   min-height: 0;
 }
 
 .history-header {
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
-  margin-bottom: 20px;
+  margin-bottom: 16px;
   width: 100%;
+  position: relative;
+}
+
+.history-subtitle {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 1.1rem;
+  font-weight: 700;
+  font-family: 'Nunito', 'Fredoka', sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.history-small-back-btn {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  background: var(--buttercream);
+  border: none;
+  color: var(--chocolate);
+  cursor: pointer;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  box-shadow: 0 4px 0 var(--buttercream-shadow);
+  transition: transform 0.08s, box-shadow 0.08s;
+  padding: 0;
+}
+
+.history-small-back-btn:active {
+  transform: translateY(calc(-50% + 3px));
+  box-shadow: 0 1px 0 var(--buttercream-shadow);
 }
 
 .history-layout .game-title {
   font-size: 2.4rem !important;
-  margin-bottom: 14px !important;
+  margin-bottom: 4px !important;
+}
+
+.history-back-btn {
+  margin-top: 16px;
 }
 
 .history-title {
   margin: 0;
+}
+
+.history-title-row {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
 }
 
 .history-list-viewport {
@@ -90,8 +147,27 @@
   flex-direction: column;
   gap: 10px;
   width: 100%;
-  /* hide scrollbar for cleaner look */
-  scrollbar-width: thin;
+  padding-right: 6px;
+  box-sizing: border-box;
+}
+
+.history-list::-webkit-scrollbar {
+  width: 10px;
+}
+
+.history-list::-webkit-scrollbar-track {
+  background: var(--bg-cream);
+  border-radius: 10px;
+}
+
+.history-list::-webkit-scrollbar-thumb {
+  background: var(--buttercream-shadow);
+  border-radius: 10px;
+  border: 2px solid var(--bg-cream);
+}
+
+.history-list::-webkit-scrollbar-thumb:hover {
+  background: var(--chocolate);
 }
 
 .history-loading {
