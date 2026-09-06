@@ -33,8 +33,8 @@ export class HistoryApi extends ApiClient {
     });
   }
 
-  deletePendingGame(roomCode, gameId) {
-    return this.delete(`/game/${roomCode}/pending/${gameId}`)
+  deletePendingGame(roomCode, gameId, options = {}) {
+    return this.delete(`/game/${roomCode}/pending/${gameId}`, options)
   }
 
   getGameDetails(gameId) {
