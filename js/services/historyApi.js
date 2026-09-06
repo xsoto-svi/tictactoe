@@ -13,8 +13,8 @@ export class HistoryApi extends ApiClient {
     return this.get(`/player/all`);
   }
 
-  getGamesByRoom(roomId) {
-    return this.get(`/room/${roomId}`);
+  getGamesByRoom(roomCode) {
+    return this.get(`/room/${roomCode}`);
   }
 
   getGamesByPlayer(playerName) {
@@ -31,6 +31,10 @@ export class HistoryApi extends ApiClient {
     return this.post(`/game/pending`, body, {
       headers: { "Content-Type": "application/json" }
     });
+  }
+
+  deletePendingGame(roomCode, gameId) {
+    return this.delete(`/game/${roomCode}/pending/${gameId}`)
   }
 
   getGameDetails(gameId) {
