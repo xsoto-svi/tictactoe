@@ -3,7 +3,9 @@ import { GameStatus, PlayerSymbol } from "./gameConstants.js";
 export class GameState {
   constructor() {
     this.roomCode = null;
+    this.gameId = null;
     this.symbol = null;
+    this.playerName = null;
 
     this.playerScore = 0;
     this.opponentScore = 0;
@@ -15,9 +17,11 @@ export class GameState {
     this.isScoreAlreadyUpdated = false;
   }
 
-  joinRoom(roomCode, tile) {
+  joinRoom(roomCode, gameId, tile, playerName) {
     this.roomCode = roomCode;
+    this.gameId = gameId;
     this.symbol = tile;
+    if (playerName) this.playerName = playerName; // Retain if not passed (like during rematch)
     this.resetLocalBoard();
   }
 
