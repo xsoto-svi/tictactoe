@@ -2,6 +2,7 @@ import { Router } from "../router.js";
 import { Page } from "./page.js";
 import { HistoryTabsComponent } from "../components/history/historyTabsComponent.js";
 import { HistoryListComponent } from "../components/history/historyListComponent.js";
+import { BoardComponent } from "../components/boardComponent.js";
 
 export class HistoryPage extends Page {
   constructor(appContainer, router, historyApi) {
@@ -46,7 +47,9 @@ export class HistoryPage extends Page {
       }
     });
 
+    this.actionButtonsContainer = document.createElement("div");
     this.backButton = document.createElement("button");
+    this.replayButton = document.createElement("button");
   }
 
   setAttributes() {
@@ -64,9 +67,20 @@ export class HistoryPage extends Page {
     this.smallBackButton.classList.add("history-small-back-btn", "hide");
     this.smallBackButton.innerHTML = `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>`;
 
-    this.backButton.classList.add("btn", "btn-butter", "history-back-btn");
-    this.backButton.style.maxWidth = "200px";
+    this.actionButtonsContainer.style.display = "flex";
+    this.actionButtonsContainer.style.display = "flex";
+    this.actionButtonsContainer.style.gap = "16px";
+    this.actionButtonsContainer.style.width = "100%";
+    this.actionButtonsContainer.style.justifyContent = "center";
+    this.actionButtonsContainer.style.marginTop = "16px";
+
+    this.backButton.classList.add("btn", "btn-butter");
+    this.backButton.style.width = "200px";
     this.backButton.textContent = "BACK TO MENU";
+
+    this.replayButton.classList.add("btn", "btn-chocolate", "hide");
+    this.replayButton.style.width = "200px";
+    this.replayButton.textContent = "REPLAY GAME";
   }
 
   appendElements() {
@@ -78,10 +92,12 @@ export class HistoryPage extends Page {
       this.listComponent.getHTML(),
     );
 
+    this.actionButtonsContainer.append(this.backButton, this.replayButton);
+
     this.layoutContainer.append(
       this.tabsComponent.getHTML(),
       this.cardContainer,
-      this.backButton,
+      this.actionButtonsContainer,
     );
     this.pageWrapper.append(this.layoutContainer);
   }
@@ -94,7 +110,10 @@ export class HistoryPage extends Page {
     this.smallBackButton.addEventListener("click", () => {
       this.listComponent.triggerTransition("backward");
 
-      if (this.currentView === "DETAILS") {
+      if (this.currentView === "REPLAY") {
+        this.stopReplay();
+        this.loadGameDetails(this.lastSelectedGame);
+      } else if (this.currentView === "DETAILS") {
         this.currentView = "GAMES";
         this.subtitle.textContent = this.tabsComponent.activeTab === "ROOMS" ? `ROOM: ${this.lastSelectedEntity}` : `PLAYER: ${this.lastSelectedEntity}`;
         this.listComponent.renderGames(
@@ -108,12 +127,20 @@ export class HistoryPage extends Page {
         this.loadActiveTab(this.tabsComponent.activeTab);
       }
     });
+    this.replayButton.addEventListener("click", () => {
+      this.router.navigate(Router.Screens.REPLAY, "forward", true, {
+        details: this.lastGameDetails,
+        gameId: this.lastSelectedGame
+      });
+    });
   }
 
   async loadActiveTab(tabName) {
     this.tabsComponent.show();
     this.smallBackButton.classList.add("hide");
     this.subtitle.classList.add("hide");
+    this.replayButton.classList.add("hide");
+    this.backButton.classList.remove("hide");
 
     this.listComponent.renderMessage("Loading...");
     try {
@@ -138,6 +165,8 @@ export class HistoryPage extends Page {
     this.smallBackButton.classList.remove("hide");
     this.subtitle.classList.remove("hide");
     this.subtitle.textContent = this.tabsComponent.activeTab === "ROOMS" ? `ROOM: ${entityId}` : `PLAYER: ${entityId}`;
+    this.replayButton.classList.add("hide");
+    this.backButton.classList.remove("hide");
 
     this.listComponent.renderMessage("Loading...");
     try {
@@ -159,6 +188,7 @@ export class HistoryPage extends Page {
   }
 
   async loadGameDetails(gameId) {
+    this.lastSelectedGame = gameId;
     this.currentView = "DETAILS";
     this.smallBackButton.classList.remove("hide");
     this.subtitle.classList.remove("hide");
@@ -167,7 +197,14 @@ export class HistoryPage extends Page {
     this.listComponent.renderMessage("Loading...");
     try {
       const details = await this.historyApi.getGameDetails(gameId);
+      this.lastGameDetails = details;
       this.listComponent.renderDetails(details);
+
+      if (details && (!Array.isArray(details) || details.length > 0)) {
+        this.replayButton.classList.remove("hide");
+      } else {
+        this.replayButton.classList.add("hide");
+      }
     } catch (e) {
       this.listComponent.renderMessage(
         "Failed to load game details. The API endpoints might not be implemented yet.",

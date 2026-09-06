@@ -10,45 +10,68 @@ export class ScoreBoardComponent extends Component {
   }
 
   initializeElements() {
+    this.playerSide = document.createElement("div");
+    this.playerIconWrapper = document.createElement("div");
     this.playerIcon = document.createElement("img");
-    this.playerScoreCard = document.createElement("div");
-    this.playersScore = document.createElement("span");
+    this.playerInfo = document.createElement("div");
+    this.playerNameDiv = document.createElement("div");
+    this.playerScoreDiv = document.createElement("div");
 
     this.vsDivider = document.createElement("span");
 
-    this.opponentScoreCard = document.createElement("div");
-    this.opponentsScore = document.createElement("span");
+    this.opponentSide = document.createElement("div");
+    this.opponentIconWrapper = document.createElement("div");
     this.opponentIcon = document.createElement("img");
+    this.opponentInfo = document.createElement("div");
+    this.opponentNameDiv = document.createElement("div");
+    this.opponentScoreDiv = document.createElement("div");
   }
 
   setAttributes() {
-    this.componentContainer.classList.add("score-board");
-    this.playerScoreCard.classList.add("score-card-item");
-    this.opponentScoreCard.classList.add("score-card-item");
+    this.componentContainer.classList.add("score-board-wrapper");
 
+    this.playerSide.classList.add("score-card-side", "player-side");
+    this.playerIconWrapper.classList.add("score-card-symbol");
     this.playerIcon.classList.add("score-symbol-icon");
-    this.opponentIcon.classList.add("score-symbol-icon");
+    this.playerInfo.classList.add("score-card-info");
+    this.playerNameDiv.classList.add("score-card-name");
+    this.playerScoreDiv.classList.add("score-card-score");
 
     this.vsDivider.classList.add("score-vs");
     this.vsDivider.textContent = "VS";
+
+    this.opponentSide.classList.add("score-card-side", "opponent-side");
+    this.opponentIconWrapper.classList.add("score-card-symbol");
+    this.opponentIcon.classList.add("score-symbol-icon");
+    this.opponentInfo.classList.add("score-card-info");
+    this.opponentNameDiv.classList.add("score-card-name");
+    this.opponentScoreDiv.classList.add("score-card-score");
   }
 
   appendElements() {
-    this.playerScoreCard.append(this.playersScore);
-    this.opponentScoreCard.append(this.opponentsScore);
+    this.playerIconWrapper.append(this.playerIcon);
+    this.playerInfo.append(this.playerNameDiv, this.playerScoreDiv);
+    this.playerSide.append(this.playerIconWrapper, this.playerInfo);
+
+    // Opponent mirror
+    this.opponentIconWrapper.append(this.opponentIcon);
+    this.opponentInfo.append(this.opponentNameDiv, this.opponentScoreDiv);
+    this.opponentSide.append(this.opponentInfo, this.opponentIconWrapper); // icon on right for opponent
 
     this.componentContainer.append(
-      this.playerIcon,
-      this.playerScoreCard,
+      this.playerSide,
       this.vsDivider,
-      this.opponentScoreCard,
-      this.opponentIcon,
+      this.opponentSide
     );
   }
 
   update(gameState) {
-    this.playersScore.textContent = `Player: ${gameState.playerScore}`;
-    this.opponentsScore.textContent = `Opponent: ${gameState.opponentScore}`;
+    this.playerNameDiv.textContent = gameState.playerName || "Player";
+    this.playerScoreDiv.textContent = `Score: ${gameState.playerScore}`;
+    
+    // For opponent, we don't have the exact name, so we use Opponent
+    this.opponentNameDiv.textContent = "Opponent";
+    this.opponentScoreDiv.textContent = `Score: ${gameState.opponentScore}`;
 
     const opponentSymbol =
       gameState.symbol === PlayerSymbol.X ? PlayerSymbol.O : PlayerSymbol.X;

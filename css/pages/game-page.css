@@ -1,42 +1,102 @@
-.score-board {
+.score-board-wrapper {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 10px;
+  gap: 16px;
   background-color: transparent !important;
-  border: none !important;
-  box-shadow: none !important;
-  padding: 0 !important;
-  margin-bottom: 16px;
+  margin-bottom: 24px;
   width: fit-content;
   margin-left: auto;
   margin-right: auto;
 }
 
-.score-card-item {
+.score-card-side {
+  display: flex;
+  align-items: center;
+  position: relative;
+}
+
+.score-card-symbol {
+  width: 76px;
+  height: 76px;
+  border-radius: 50%;
   background-color: var(--buttercream);
-  padding: 8px 14px;
-  border-radius: 12px;
-  box-shadow: 0 4px 0 var(--buttercream-shadow);
-  font-family: 'Fredoka', 'Nunito', sans-serif;
-  font-weight: 700;
-  color: var(--chocolate);
-  font-size: 0.95rem;
-  letter-spacing: 0.5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
 }
 
 .score-symbol-icon {
-  width: 28px;
-  height: 28px;
+  width: 36px;
+  height: 36px;
   object-fit: contain;
+}
+
+.score-card-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  z-index: 1;
+}
+
+.player-side .score-card-info {
+  margin-left: -30px;
+}
+
+.opponent-side .score-card-info {
+  margin-right: -30px;
+}
+
+.score-card-name {
+  background-color: var(--buttercream);
+  border-radius: 20px;
+  font-family: 'Fredoka', 'Nunito', sans-serif;
+  font-weight: 700;
+  color: var(--chocolate);
+  font-size: 1rem;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+  padding: 8px 20px;
+  min-width: 140px;
+}
+
+.score-card-score {
+  background-color: rgba(255, 255, 255, 0.5);
+  border-radius: 20px;
+  font-family: 'Fredoka', 'Nunito', sans-serif;
+  font-weight: 600;
+  color: var(--chocolate);
+  font-size: 0.85rem;
+  white-space: nowrap;
+  padding: 4px 16px;
+  align-self: flex-start;
+  min-width: 100px;
+}
+
+.player-side .score-card-name {
+  padding-left: 40px;
+}
+
+.player-side .score-card-score {
+  padding-left: 46px;
+}
+
+.opponent-side .score-card-name {
+  padding-right: 40px;
+}
+
+.opponent-side .score-card-score {
+  padding-right: 46px;
+  align-self: flex-end;
+  text-align: right;
 }
 
 .score-vs {
   font-family: 'Lilita One', 'Fredoka', sans-serif;
-  font-size: 0.9rem;
+  font-size: 1.1rem;
   color: var(--chocolate);
   opacity: 0.6;
-  padding: 0 4px;
 }
 
 .status-bar {

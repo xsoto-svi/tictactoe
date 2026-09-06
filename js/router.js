@@ -3,6 +3,7 @@ import { HowToPlayPage } from "./pages/howToPlayPage.js";
 import { LobbyPage } from "./pages/lobbyPage.js";
 import { GamePage } from "./pages/gamePage.js";
 import { HistoryPage } from "./pages/historyPage.js";
+import { ReplayPage } from "./pages/replayPage.js";
 
 export class Router {
   static Screens = {
@@ -11,6 +12,7 @@ export class Router {
     LOBBY: "LOBBY",
     GAME: "GAME",
     HISTORY: "HISTORY",
+    REPLAY: "REPLAY",
   };
 
   static SlideTransitions = {
@@ -65,8 +67,15 @@ export class Router {
       case Router.Screens.HISTORY:
         activePage = new HistoryPage(this.appContainer, this, this.historyApi);
         break;
+      case Router.Screens.REPLAY:
+        activePage = new ReplayPage(this.appContainer, this);
+        if (params.details && params.gameId) {
+           activePage.setReplayData(params.details, params.gameId);
+        }
+        break;
       default:
-        activePage = new HomePage(this.appContainer, this);
+        console.error("Unknown screen:", screenName);
+        return;
     }
 
     activePage.render();
