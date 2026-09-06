@@ -34,7 +34,7 @@ export class HomePage extends Page {
     this.menuContainer.classList.add("btn-group");
 
     this.startButton.classList.add("btn", "btn-chocolate");
-    this.startButton.textContent = "Start Game";
+    this.startButton.textContent = "Start";
 
     this.howToPlayButton.classList.add("btn", "btn-butter");
     this.howToPlayButton.textContent = "How To Play";
