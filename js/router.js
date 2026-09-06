@@ -50,6 +50,7 @@ export class Router {
           this,
           this.tictactoeApi,
           this.gameState,
+          this.historyApi
         );
         break;
       case Router.Screens.GAME:
@@ -58,6 +59,7 @@ export class Router {
           this,
           this.tictactoeApi,
           this.gameState,
+          this.historyApi
         );
         break;
       case Router.Screens.HISTORY:
