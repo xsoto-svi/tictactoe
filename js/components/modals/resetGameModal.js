@@ -41,7 +41,7 @@ export class ResetGameModal extends Modal {
     this.buttonsGroup.classList.add("btns-grp");
 
     if (this.winner === this.symbol) {
-      this.statusMessage.textContent = "You Won! 🎉";
+      this.statusMessage.textContent = "You Won!";
     } else if (this.status === GameStatus.DRAW) {
       this.statusMessage.textContent = "It's a Draw!";
     } else if (this.winner !== this.symbol) {
