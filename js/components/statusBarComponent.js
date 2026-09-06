@@ -33,7 +33,7 @@ export class StatusBarComponent extends Component {
       this.gameStatusBar.classList.remove("my-turn");
     } else if (gameState.status === GameStatus.PLAYING) {
       if (gameState.isMyTurn) {
-        this.gameStatusBar.textContent = "It's your turn! 🎮";
+        this.gameStatusBar.textContent = "It's your turn!";
         this.gameStatusBar.classList.add("my-turn");
       } else {
         this.gameStatusBar.textContent = "Opponent's turn...";
@@ -41,7 +41,7 @@ export class StatusBarComponent extends Component {
       }
     } else if (gameState.status === GameStatus.GAME_OVER) {
       this.gameStatusBar.textContent =
-        gameState.winner === gameState.symbol ? "You Won! 🎉" : "You Lost!";
+        gameState.winner === gameState.symbol ? "You Won!" : "You Lost";
     } else if (gameState.status === GameStatus.DRAW) {
       this.gameStatusBar.textContent = "It's a draw!";
     }
