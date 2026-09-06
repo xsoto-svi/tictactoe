@@ -55,7 +55,7 @@ export class GamePollingService {
     poll();
   }
 
-  startRematchPoll(oldRoomCode, nextRoomCode, newAssignedSymbol) {
+  startRematchPoll(oldRoomCode, nextRoomCode, newGameId) {
     this.stopAllPolls();
 
     let isPollingInProgress = false;
@@ -73,7 +73,7 @@ export class GamePollingService {
           this.callbacks.onRematchReady(
             oldRoomCode,
             nextRoomCode,
-            newAssignedSymbol,
+            newGameId,
           );
           return;
         }
@@ -84,7 +84,7 @@ export class GamePollingService {
         if (oldRoomData === "[GAME NOT YET STARTED]") {
           // THE OPPONENT LEFT!
           this.stopAllPolls();
-          this.callbacks.onOpponentLeftRematch(nextRoomCode);
+          this.callbacks.onOpponentLeftRematch(nextRoomCode, newGameId);
           return;
         }
       } catch (error) {

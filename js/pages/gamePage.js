@@ -11,10 +11,11 @@ import { Page } from "./page.js";
 import { GamePollingService } from "../services/gamePollingService.js";
 
 export class GamePage extends Page {
-  constructor(appContainer, router, tictactoeApi, gameState) {
+  constructor(appContainer, router, tictactoeApi, gameState, historyApi) {
     super(appContainer);
     this.router = router;
     this.tictactoeApi = tictactoeApi;
+    this.historyApi = historyApi;
     this.gameState = gameState;
     this.isProcessingMove = false;
     this.isGameOverModalPresent = false;
@@ -34,8 +35,8 @@ export class GamePage extends Page {
           this.handleError(title, msg, disconnect),
         onRematchReady: (oldCode, nextCode, symbol) =>
           this.handleRematchReady(oldCode, nextCode, symbol),
-        onOpponentLeftRematch: (nextCode) =>
-          this.handleOpponentLeftRematch(nextCode),
+        onOpponentLeftRematch: (nextCode, newGameId) =>
+          this.handleOpponentLeftRematch(nextCode, newGameId),
       },
     );
 
@@ -93,7 +94,10 @@ export class GamePage extends Page {
     this.pollingService.stopAllPolls();
 
     if (roomCode) {
-      this.tictactoeApi.resetGame(roomCode).catch(() => {});
+      this.tictactoeApi.resetGame(roomCode, { keepalive: true }).catch(() => {});
+      if (this.gameState.gameId) {
+        this.historyApi.deletePendingGame(roomCode, this.gameState.gameId, { keepalive: true }).catch(() => {});
+      }
     }
 
     this.gameState.resetScore();
@@ -150,6 +154,19 @@ export class GamePage extends Page {
 
       if (response !== "[TAKEN]") {
         this.gameState.applyLocalMove(index);
+
+        const moveData = {
+          gameid: `${this.gameState.roomCode}_${this.gameState.gameId}`,
+          symbol: this.gameState.symbol,
+          location: index,
+          playername: this.gameState.playerName,
+          datesave: new Date().toISOString()
+        };
+
+        this.historyApi.saveMove(moveData).catch(err => {
+          console.error("Failed to save move", err)
+        });
+
         this.updateUI();
 
         if (this.gameState.isGameOver) {
@@ -193,10 +210,26 @@ export class GamePage extends Page {
         try {
           const newAssignedSymbol =
             await this.tictactoeApi.createGame(nextRoomCode);
+
+          let newGameId;
+          let responseData;
+          if (newAssignedSymbol === PlayerSymbol.X) {
+            responseData = await this.historyApi.createPendingGame({
+              playername: this.gameState.playerName,
+              roomcode: nextRoomCode
+            });
+          } else {
+            responseData = await this.historyApi.joinPendingGame({
+              playername: this.gameState.playerName,
+              roomcode: nextRoomCode
+            });
+          }
+          newGameId = typeof responseData === 'object' ? (responseData.gameid || responseData.id) : responseData;
+
           this.pollingService.startRematchPoll(
             oldRoomCode,
             nextRoomCode,
-            newAssignedSymbol,
+            newGameId,
           );
         } catch (error) {
           LoadingModal.hideLoading();
@@ -215,23 +248,26 @@ export class GamePage extends Page {
     resetGameModal.open();
   }
 
-  handleRematchReady(oldRoomCode, nextRoomCode, newAssignedSymbol) {
+  handleRematchReady(oldRoomCode, nextRoomCode, newGameId) {
     LoadingModal.hideLoading();
 
     if (this.gameState.symbol === PlayerSymbol.O) {
       this.tictactoeApi.resetGame(oldRoomCode).catch(() => {});
     }
 
-    this.gameState.joinRoom(nextRoomCode, newAssignedSymbol);
+    this.gameState.joinRoom(nextRoomCode, newGameId, this.gameState.symbol, this.gameState.playerName);
 
     this.scoreBoard.update(this.gameState);
     this.updateUI();
     this.pollingService.startGamePoll();
   }
 
-  handleOpponentLeftRematch(nextRoomCode) {
+  handleOpponentLeftRematch(nextRoomCode, newGameId) {
     LoadingModal.hideLoading();
-    this.handleLeaveGame(nextRoomCode); // Clean up the new room
+    if (newGameId) {
+      this.historyApi.deletePendingGame(nextRoomCode, newGameId, { keepalive: true }).catch(() => {});
+    }
+    this.handleLeaveGame(nextRoomCode); // Clean up the new room from socket
     const alert = new AlertModal("Game Over", "Your opponent left the game.");
     alert.open();
   }
