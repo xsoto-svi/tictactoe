@@ -5,7 +5,6 @@ export class HistoryApi extends ApiClient {
     super("http://localhost:8080/tictactoe-webservice/api");
   }
 
-  // Placeholder APIs for History
   getAllRooms() {
     return this.get(`/room/all`);
   }
@@ -22,11 +21,25 @@ export class HistoryApi extends ApiClient {
     return this.get(`/player/${playerName}/games`);
   }
 
+  createPendingGame(body) {
+    return this.post(`/game/create`, body, {
+      headers: { "Content-Type": "application/json" }
+    });
+  }
+
+  joinPendingGame(body) {
+    return this.post(`/game/pending`, body, {
+      headers: { "Content-Type": "application/json" }
+    });
+  }
+
   getGameDetails(gameId) {
     return this.get(`/game/${gameId}`);
   }
 
   saveMove(body) {
-    return this.post(`/game/save`, body);
+    return this.post(`/game/save`, body, {
+      headers: { "Content-Type": "application/json" }
+    });
   }
 }
