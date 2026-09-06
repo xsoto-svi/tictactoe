@@ -14,7 +14,25 @@ export class ApiClient {
 		});
 
 		if (!response.ok) {
-			throw new Error(`API Error: ${response.status} ${response.statusText}`);
+			let errorMsg = `API Error: ${response.status} ${response.statusText}`;
+			let errorData;
+			
+			try {
+				errorData = await this.parseResponse(response);
+				if (errorData && errorData.message) {
+					errorMsg = errorData.message;
+					
+					// Optionally append detailed validation errors if they exist
+					if (errorData.errors && Array.isArray(errorData.errors)) {
+							errorMsg += "\n" + errorData.errors.join("\n");
+					}
+				}
+			} catch (e) {}
+
+			const error = new Error(errorMsg);
+			error.status = response.status;
+			error.data = errorData;
+			throw error;
 		}
 
 		return this.parseResponse(response);
