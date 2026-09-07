@@ -114,11 +114,12 @@ export class HistoryListComponent extends Component {
       btn.classList.add("btn", "btn-butter");
       const gameId =
         typeof game === "object" ? game.id || game.gameid || game.gameId : game;
-      btn.textContent = `Game ${index + 1}`;
+      const displayStr = `GAME ${index + 1}`;
+      btn.textContent = displayStr;
 
       btn.addEventListener("click", () => {
         this.triggerTransition("forward");
-        this.onItemClick({ type: "GAME", id: gameId });
+        this.onItemClick({ type: "GAME", id: gameId, displayStr });
       });
 
       this.listContainer.append(btn);
@@ -151,7 +152,14 @@ export class HistoryListComponent extends Component {
 
       const symbolDiv = document.createElement("div");
       symbolDiv.classList.add("history-move-symbol");
-      symbolDiv.textContent = move.symbol;
+      const symbolImg = document.createElement("img");
+      symbolImg.src =
+        move.symbol.toUpperCase() === "X"
+          ? "assets/x-icon.svg"
+          : "assets/o-icon.svg";
+      symbolImg.style.width = "40px";
+      symbolImg.style.height = "40px";
+      symbolDiv.append(symbolImg);
 
       const detailsDiv = document.createElement("div");
       detailsDiv.classList.add("history-move-details");

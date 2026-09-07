@@ -43,7 +43,7 @@ export class HistoryPage extends Page {
       if (action.type === "ENTITY") {
         this.loadGamesForEntity(action.id);
       } else if (action.type === "GAME") {
-        this.loadGameDetails(action.id);
+        this.loadGameDetails(action.id, action.displayStr);
       }
     });
 
@@ -112,10 +112,13 @@ export class HistoryPage extends Page {
 
       if (this.currentView === "REPLAY") {
         this.stopReplay();
-        this.loadGameDetails(this.lastSelectedGame);
+        this.loadGameDetails(this.lastSelectedGame, this.lastSelectedDisplay);
       } else if (this.currentView === "DETAILS") {
         this.currentView = "GAMES";
-        this.subtitle.textContent = this.tabsComponent.activeTab === "ROOMS" ? `ROOM: ${this.lastSelectedEntity}` : `PLAYER: ${this.lastSelectedEntity}`;
+        this.subtitle.textContent =
+          this.tabsComponent.activeTab === "ROOMS"
+            ? `ROOM: ${this.lastSelectedEntity}`
+            : `PLAYER: ${this.lastSelectedEntity}`;
         this.listComponent.renderGames(
           this.lastGamesData,
           this.lastSelectedEntity,
@@ -130,7 +133,7 @@ export class HistoryPage extends Page {
     this.replayButton.addEventListener("click", () => {
       this.router.navigate(Router.Screens.REPLAY, "forward", true, {
         details: this.lastGameDetails,
-        gameId: this.lastSelectedGame
+        gameId: this.lastSelectedGame,
       });
     });
   }
@@ -152,10 +155,7 @@ export class HistoryPage extends Page {
       }
       this.listComponent.renderEntities(data);
     } catch (e) {
-      this.listComponent.renderMessage(
-        "Failed to load data.",
-        true,
-      );
+      this.listComponent.renderMessage("Failed to load data.", true);
     }
   }
 
@@ -164,7 +164,10 @@ export class HistoryPage extends Page {
     this.tabsComponent.hide();
     this.smallBackButton.classList.remove("hide");
     this.subtitle.classList.remove("hide");
-    this.subtitle.textContent = this.tabsComponent.activeTab === "ROOMS" ? `ROOM: ${entityId}` : `PLAYER: ${entityId}`;
+    this.subtitle.textContent =
+      this.tabsComponent.activeTab === "ROOMS"
+        ? `ROOM: ${entityId}`
+        : `PLAYER: ${entityId}`;
     this.replayButton.classList.add("hide");
     this.backButton.classList.remove("hide");
 
@@ -187,12 +190,13 @@ export class HistoryPage extends Page {
     }
   }
 
-  async loadGameDetails(gameId) {
+  async loadGameDetails(gameId, displayStr) {
     this.lastSelectedGame = gameId;
+    this.lastSelectedDisplay = displayStr; // store for back logic if needed
     this.currentView = "DETAILS";
     this.smallBackButton.classList.remove("hide");
     this.subtitle.classList.remove("hide");
-    this.subtitle.textContent = `GAME: ${gameId}`;
+    this.subtitle.textContent = displayStr ? displayStr : `GAME: ${gameId}`;
 
     this.listComponent.renderMessage("Loading...");
     try {
