@@ -167,22 +167,25 @@ export class HistoryListComponent extends Component {
       const playerDiv = document.createElement("div");
       const playerStrong = document.createElement("strong");
       playerStrong.textContent = "Player: ";
-      playerDiv.append(playerStrong, `${move.playername}`);
+      const playerSpan = document.createElement("span");
+      playerSpan.textContent = `${move.playername}`;
+      playerDiv.append(playerStrong, playerSpan);
 
       const row = Math.floor(move.location / 3) + 1;
       const col = (move.location % 3) + 1;
       const locationDiv = document.createElement("div");
       const locationStrong = document.createElement("strong");
       locationStrong.textContent = "Location: ";
-      locationDiv.append(locationStrong, `Row ${row}, Column ${col}`);
+      const locationSpan = document.createElement("span");
+      locationSpan.textContent = `Row ${row}, Column ${col}`;
+      locationDiv.append(locationStrong, locationSpan);
 
       const dateDiv = document.createElement("div");
       const dateStrong = document.createElement("strong");
       dateStrong.textContent = "Date: ";
-      dateDiv.append(
-        dateStrong,
-        `${new Date(move.datesaved).toLocaleString()}`,
-      );
+      const dateSpan = document.createElement("span");
+      dateSpan.textContent = `${new Date(move.datesaved).toLocaleString()}`;
+      dateDiv.append(dateStrong, dateSpan);
 
       detailsDiv.append(playerDiv, locationDiv, dateDiv);
       moveCard.append(symbolDiv, detailsDiv);

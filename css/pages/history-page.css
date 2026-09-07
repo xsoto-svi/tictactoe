@@ -215,7 +215,16 @@
   gap: 4px;
   font-family: "Nunito", "Fredoka", sans-serif;
   font-size: 0.95rem;
-  color: var(--text-main);
+}
+
+.history-move-details strong {
+  font-weight: 800;
+  color: var(--chocolate);
+}
+
+.history-move-details span {
+  font-weight: 600;
+  color: var(--text-muted);
 }
 
 .hide {
