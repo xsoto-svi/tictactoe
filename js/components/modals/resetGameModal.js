@@ -9,7 +9,7 @@ export class ResetGameModal extends Modal {
     winner,
     status,
     onPlayAgain,
-    onLeave
+    onLeave,
   ) {
     super(container, isDismissible);
 
@@ -30,7 +30,7 @@ export class ResetGameModal extends Modal {
     this.buttonsGroup = document.createElement("div");
 
     this.leaveButton = document.createElement("button");
-    
+
     if (this.symbol) {
       this.playAgainButton = document.createElement("button");
     }
@@ -45,7 +45,7 @@ export class ResetGameModal extends Modal {
     } else if (this.status === GameStatus.DRAW) {
       this.statusMessage.textContent = "It's a Draw!";
     } else if (this.winner !== this.symbol) {
-      this.statusMessage.textContent = "You Lost!";
+      this.statusMessage.textContent = "You Lost";
     }
 
     this.leaveButton.textContent = "Leave";
@@ -53,7 +53,7 @@ export class ResetGameModal extends Modal {
 
     if (this.symbol) {
       this.playAgainButton.textContent = "Play Again";
-      this.playAgainButton.classList.add("primary-button"); 
+      this.playAgainButton.classList.add("primary-button");
     }
   }
 
@@ -76,7 +76,7 @@ export class ResetGameModal extends Modal {
     if (this.symbol) {
       this.playAgainButton.addEventListener("click", () => {
         this.close();
-        if (this.onPlayAgain) this.onPlayAgain(); 
+        if (this.onPlayAgain) this.onPlayAgain();
       });
     }
   }
