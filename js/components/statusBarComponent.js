@@ -36,7 +36,8 @@ export class StatusBarComponent extends Component {
         this.gameStatusBar.textContent = "It's your turn!";
         this.gameStatusBar.classList.add("my-turn");
       } else {
-        this.gameStatusBar.textContent = "Opponent's turn...";
+        const opName = gameState.opponentName || "Opponent";
+        this.gameStatusBar.textContent = `${opName}'s turn...`;
         this.gameStatusBar.classList.remove("my-turn");
       }
     } else if (gameState.status === GameStatus.GAME_OVER) {

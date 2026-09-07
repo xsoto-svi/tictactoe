@@ -23,27 +23,31 @@ export class HistoryApi extends ApiClient {
 
   createPendingGame(body) {
     return this.post(`/game/create`, body, {
-      headers: { "Content-Type": "application/json" }
+      headers: { "Content-Type": "application/json" },
     });
   }
 
   joinPendingGame(body) {
     return this.post(`/game/pending`, body, {
-      headers: { "Content-Type": "application/json" }
+      headers: { "Content-Type": "application/json" },
     });
   }
 
   deletePendingGame(roomCode, gameId, options = {}) {
-    return this.delete(`/game/${roomCode}/pending/${gameId}`, options)
+    return this.delete(`/game/${roomCode}/pending/${gameId}`, options);
   }
 
   getGameDetails(gameId) {
     return this.get(`/game/${gameId}`);
   }
 
+  checkGameStatus(gameId) {
+    return this.get(`/game/status/${gameId}`);
+  }
+
   saveMove(body) {
     return this.post(`/game/save`, body, {
-      headers: { "Content-Type": "application/json" }
+      headers: { "Content-Type": "application/json" },
     });
   }
 }

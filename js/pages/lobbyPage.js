@@ -117,8 +117,14 @@ export class LobbyPage extends Page {
   attachEvents() {
     this.handleBeforeUnload = () => {
       if (this.gameState.roomCode && this.gameState.gameId) {
-        this.tictactoeApi.resetGame(this.gameState.roomCode, { keepalive: true }).catch(() => {});
-        this.historyApi.deletePendingGame(this.gameState.roomCode, this.gameState.gameId, { keepalive: true }).catch(() => {});
+        this.tictactoeApi
+          .resetGame(this.gameState.roomCode, { keepalive: true })
+          .catch(() => {});
+        this.historyApi
+          .deletePendingGame(this.gameState.roomCode, this.gameState.gameId, {
+            keepalive: true,
+          })
+          .catch(() => {});
       }
     };
     window.addEventListener("beforeunload", this.handleBeforeUnload);
@@ -137,17 +143,26 @@ export class LobbyPage extends Page {
         "Enter your name to host the game:",
         "Your Name",
         async (playerName) => {
-          const roomCode = Math.random().toString(36).substring(2, 6).toUpperCase();
+          const roomCode = Math.random()
+            .toString(36)
+            .substring(2, 6)
+            .toUpperCase();
           LoadingModal.showLoading("Connecting to server...", "Please wait...");
 
           try {
             let responseData = await this.historyApi.createPendingGame({
               playername: playerName,
-              roomcode: roomCode
+              roomcode: roomCode,
             });
             // Extract the actual UUID string if the server returned a JSON object
-            const gameId = typeof responseData === 'object' ? (responseData.gameId || responseData.id || responseData.uuid || responseData.gameUuid) : responseData;
-            
+            const gameId =
+              typeof responseData === "object"
+                ? responseData.gameId ||
+                  responseData.id ||
+                  responseData.uuid ||
+                  responseData.gameUuid
+                : responseData;
+
             const symbol = await this.tictactoeApi.createGame(roomCode);
 
             LoadingModal.hideLoading();
@@ -160,13 +175,31 @@ export class LobbyPage extends Page {
             this.gameState.joinRoom(roomCode, gameId, symbol, playerName);
 
             const checkInterval = setInterval(async () => {
-              const isReady = await this.tictactoeApi.checkRoomStatus(roomCode);
-              if (isReady == "true") {
-                LoadingModal.hideLoading();
-                clearInterval(checkInterval);
-                this.gameState.status = GameStatus.PLAYING;
-                window.removeEventListener("beforeunload", this.handleBeforeUnload);
-                this.router.navigate(Router.Screens.GAME);
+              try {
+                const statusData =
+                  await this.historyApi.checkGameStatus(gameId);
+                const isReady =
+                  await this.tictactoeApi.checkRoomStatus(roomCode);
+
+                if (
+                  statusData &&
+                  statusData.status === "MATCH_FOUND" &&
+                  isReady == "true"
+                ) {
+                  if (statusData.opponentname) {
+                    this.gameState.opponentName = statusData.opponentname;
+                  }
+                  LoadingModal.hideLoading();
+                  clearInterval(checkInterval);
+                  this.gameState.status = GameStatus.PLAYING;
+                  window.removeEventListener(
+                    "beforeunload",
+                    this.handleBeforeUnload,
+                  );
+                  this.router.navigate(Router.Screens.GAME);
+                }
+              } catch (err) {
+                console.error("Error checking status:", err);
               }
             }, 500);
           } catch (error) {
@@ -177,7 +210,7 @@ export class LobbyPage extends Page {
             );
             alertModal.open();
           }
-        }
+        },
       );
       prompt.open();
     });
@@ -224,16 +257,31 @@ export class LobbyPage extends Page {
         try {
           let responseData = await this.historyApi.joinPendingGame({
             playername: playerName,
-            roomcode: enteredCode
+            roomcode: enteredCode,
           });
-          gameId = typeof responseData === 'object' ? (responseData.gameId || responseData.id || responseData.uuid || responseData.gameUuid) : responseData;
+
+          if (typeof responseData === "object") {
+            gameId =
+              responseData.gameId ||
+              responseData.id ||
+              responseData.uuid ||
+              responseData.gameUuid;
+            if (responseData.playername) {
+              this.gameState.opponentName = responseData.playername;
+            }
+          } else {
+            gameId = responseData;
+          }
         } catch (err) {
           LoadingModal.hideLoading();
           if (err.status === 400 && err.data && err.data.message) {
             const alertModal = new AlertModal("Cannot Join", err.data.message);
             alertModal.open();
           } else {
-            const alertModal = new AlertModal("Network Error", "Could not connect to the history service.");
+            const alertModal = new AlertModal(
+              "Network Error",
+              "Could not connect to the history service.",
+            );
             alertModal.open();
           }
           return;
@@ -253,7 +301,12 @@ export class LobbyPage extends Page {
             alertModal.open();
           } else if (symbol === PlayerSymbol.O) {
             LoadingModal.hideLoading();
-            this.gameState.joinRoom(enteredCode, gameId, PlayerSymbol.O, playerName);
+            this.gameState.joinRoom(
+              enteredCode,
+              gameId,
+              PlayerSymbol.O,
+              playerName,
+            );
             this.gameState.status = GameStatus.PLAYING;
             window.removeEventListener("beforeunload", this.handleBeforeUnload);
             this.router.navigate(Router.Screens.GAME);
@@ -273,7 +326,7 @@ export class LobbyPage extends Page {
           );
           alertModal.open();
         }
-      }
+      },
     );
     prompt.open();
   };

@@ -6,6 +6,7 @@ export class GameState {
     this.gameId = null;
     this.symbol = null;
     this.playerName = null;
+    this.opponentName = null;
 
     this.playerScore = 0;
     this.opponentScore = 0;
@@ -103,7 +104,9 @@ export class GameState {
   }
 
   get isGameOver() {
-    return this.status === GameStatus.GAME_OVER || this.status === GameStatus.DRAW;
+    return (
+      this.status === GameStatus.GAME_OVER || this.status === GameStatus.DRAW
+    );
   }
 
   get isMyTurn() {

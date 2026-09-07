@@ -61,16 +61,16 @@ export class ScoreBoardComponent extends Component {
     this.componentContainer.append(
       this.playerSide,
       this.vsDivider,
-      this.opponentSide
+      this.opponentSide,
     );
   }
 
   update(gameState) {
     this.playerNameDiv.textContent = gameState.playerName || "Player";
     this.playerScoreDiv.textContent = `Score: ${gameState.playerScore}`;
-    
-    // For opponent, we don't have the exact name, so we use Opponent
-    this.opponentNameDiv.textContent = "Opponent";
+
+    // Use opponentName if available, otherwise default to Opponent
+    this.opponentNameDiv.textContent = gameState.opponentName || "Opponent";
     this.opponentScoreDiv.textContent = `Score: ${gameState.opponentScore}`;
 
     const opponentSymbol =
