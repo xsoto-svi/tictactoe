@@ -171,7 +171,10 @@ export class HistoryListComponent extends Component {
       const dateDiv = document.createElement("div");
       const dateStrong = document.createElement("strong");
       dateStrong.textContent = "Date: ";
-      dateDiv.append(dateStrong, `${new Date(move.datesaved).toLocaleString()}`);
+      dateDiv.append(
+        dateStrong,
+        `${new Date(move.datesaved).toLocaleString()}`,
+      );
 
       detailsDiv.append(playerDiv, locationDiv, dateDiv);
       moveCard.append(symbolDiv, detailsDiv);
