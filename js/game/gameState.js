@@ -103,7 +103,9 @@ export class GameState {
   }
 
   get isGameOver() {
-    return this.status === GameStatus.GAME_OVER || this.status === GameStatus.DRAW;
+    return (
+      this.status === GameStatus.GAME_OVER || this.status === GameStatus.DRAW
+    );
   }
 
   get isMyTurn() {

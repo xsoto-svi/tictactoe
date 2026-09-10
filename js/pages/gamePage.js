@@ -94,10 +94,9 @@ export class GamePage extends Page {
     this.pollingService.stopAllPolls();
 
     if (roomCode) {
-      this.tictactoeApi.resetGame(roomCode, { keepalive: true }).catch(() => {});
-      if (this.gameState.gameId) {
-        this.historyApi.deletePendingGame(roomCode, this.gameState.gameId, { keepalive: true }).catch(() => {});
-      }
+      this.tictactoeApi
+        .resetGame(roomCode, { keepalive: true })
+        .catch(() => {});
     }
 
     this.gameState.resetScore();
@@ -160,11 +159,11 @@ export class GamePage extends Page {
           symbol: this.gameState.symbol,
           location: index,
           playername: this.gameState.playerName,
-          datesave: new Date().toISOString()
+          datesave: new Date().toISOString(),
         };
 
-        this.historyApi.saveMove(moveData).catch(err => {
-          console.error("Failed to save move", err)
+        this.historyApi.saveMove(moveData).catch((err) => {
+          console.error("Failed to save move", err);
         });
 
         this.updateUI();
@@ -216,15 +215,18 @@ export class GamePage extends Page {
           if (newAssignedSymbol === PlayerSymbol.X) {
             responseData = await this.historyApi.createPendingGame({
               playername: this.gameState.playerName,
-              roomcode: nextRoomCode
+              roomcode: nextRoomCode,
             });
           } else {
             responseData = await this.historyApi.joinPendingGame({
               playername: this.gameState.playerName,
-              roomcode: nextRoomCode
+              roomcode: nextRoomCode,
             });
           }
-          newGameId = typeof responseData === 'object' ? (responseData.gameid || responseData.id) : responseData;
+          newGameId =
+            typeof responseData === "object"
+              ? responseData.gameid || responseData.id
+              : responseData;
 
           this.pollingService.startRematchPoll(
             oldRoomCode,
@@ -255,18 +257,20 @@ export class GamePage extends Page {
       this.tictactoeApi.resetGame(oldRoomCode).catch(() => {});
     }
 
-    this.gameState.joinRoom(nextRoomCode, newGameId, this.gameState.symbol, this.gameState.playerName);
+    this.gameState.joinRoom(
+      nextRoomCode,
+      newGameId,
+      this.gameState.symbol,
+      this.gameState.playerName,
+    );
 
     this.scoreBoard.update(this.gameState);
     this.updateUI();
     this.pollingService.startGamePoll();
   }
 
-  handleOpponentLeftRematch(nextRoomCode, newGameId) {
+  handleOpponentLeftRematch(nextRoomCode) {
     LoadingModal.hideLoading();
-    if (newGameId) {
-      this.historyApi.deletePendingGame(nextRoomCode, newGameId, { keepalive: true }).catch(() => {});
-    }
     this.handleLeaveGame(nextRoomCode); // Clean up the new room from socket
     const alert = new AlertModal("Game Over", "Your opponent left the game.");
     alert.open();

@@ -87,14 +87,12 @@ export class LobbyPage extends Page {
   }
 
   appendElements() {
-    // Assemble Create Card
     this.createGameCard.append(
       this.createGameHeading,
       this.createGameDescription,
       this.createGameButton,
     );
 
-    // Assemble Join Card (Input and button wrapped nicely)
     this.joinGameForm.append(this.joinGameTextbox, this.joinGameButton);
     this.joinGameCard.append(
       this.joinGameHeading,
@@ -102,10 +100,8 @@ export class LobbyPage extends Page {
       this.joinGameForm,
     );
 
-    // Assemble Cards Wrapper
     this.cardsWrapper.append(this.createGameCard, this.joinGameCard);
 
-    // Assemble Main Page
     this.pageWrapper.append(
       this.title,
       this.subtitle,
@@ -117,8 +113,14 @@ export class LobbyPage extends Page {
   attachEvents() {
     this.handleBeforeUnload = () => {
       if (this.gameState.roomCode && this.gameState.gameId) {
-        this.tictactoeApi.resetGame(this.gameState.roomCode, { keepalive: true }).catch(() => {});
-        this.historyApi.deletePendingGame(this.gameState.roomCode, this.gameState.gameId, { keepalive: true }).catch(() => {});
+        this.tictactoeApi
+          .resetGame(this.gameState.roomCode, { keepalive: true })
+          .catch(() => {});
+        this.historyApi
+          .cancelPendingGame(this.gameState.roomCode, this.gameState.gameId, {
+            keepalive: true,
+          })
+          .catch(() => {});
       }
     };
     window.addEventListener("beforeunload", this.handleBeforeUnload);
@@ -137,17 +139,26 @@ export class LobbyPage extends Page {
         "Enter your name to host the game:",
         "Your Name",
         async (playerName) => {
-          const roomCode = Math.random().toString(36).substring(2, 6).toUpperCase();
+          const roomCode = Math.random()
+            .toString(36)
+            .substring(2, 6)
+            .toUpperCase();
           LoadingModal.showLoading("Connecting to server...", "Please wait...");
 
           try {
             let responseData = await this.historyApi.createPendingGame({
               playername: playerName,
-              roomcode: roomCode
+              roomcode: roomCode,
             });
             // Extract the actual UUID string if the server returned a JSON object
-            const gameId = typeof responseData === 'object' ? (responseData.gameId || responseData.id || responseData.uuid || responseData.gameUuid) : responseData;
-            
+            const gameId =
+              typeof responseData === "object"
+                ? responseData.gameId ||
+                  responseData.id ||
+                  responseData.uuid ||
+                  responseData.gameUuid
+                : responseData;
+
             const symbol = await this.tictactoeApi.createGame(roomCode);
 
             LoadingModal.hideLoading();
@@ -165,7 +176,10 @@ export class LobbyPage extends Page {
                 LoadingModal.hideLoading();
                 clearInterval(checkInterval);
                 this.gameState.status = GameStatus.PLAYING;
-                window.removeEventListener("beforeunload", this.handleBeforeUnload);
+                window.removeEventListener(
+                  "beforeunload",
+                  this.handleBeforeUnload,
+                );
                 this.router.navigate(Router.Screens.GAME);
               }
             }, 500);
@@ -177,7 +191,7 @@ export class LobbyPage extends Page {
             );
             alertModal.open();
           }
-        }
+        },
       );
       prompt.open();
     });
@@ -224,16 +238,25 @@ export class LobbyPage extends Page {
         try {
           let responseData = await this.historyApi.joinPendingGame({
             playername: playerName,
-            roomcode: enteredCode
+            roomcode: enteredCode,
           });
-          gameId = typeof responseData === 'object' ? (responseData.gameId || responseData.id || responseData.uuid || responseData.gameUuid) : responseData;
+          gameId =
+            typeof responseData === "object"
+              ? responseData.gameId ||
+                responseData.id ||
+                responseData.uuid ||
+                responseData.gameUuid
+              : responseData;
         } catch (err) {
           LoadingModal.hideLoading();
           if (err.status === 400 && err.data && err.data.message) {
             const alertModal = new AlertModal("Cannot Join", err.data.message);
             alertModal.open();
           } else {
-            const alertModal = new AlertModal("Network Error", "Could not connect to the history service.");
+            const alertModal = new AlertModal(
+              "Network Error",
+              "Could not connect to the history service.",
+            );
             alertModal.open();
           }
           return;
@@ -253,7 +276,12 @@ export class LobbyPage extends Page {
             alertModal.open();
           } else if (symbol === PlayerSymbol.O) {
             LoadingModal.hideLoading();
-            this.gameState.joinRoom(enteredCode, gameId, PlayerSymbol.O, playerName);
+            this.gameState.joinRoom(
+              enteredCode,
+              gameId,
+              PlayerSymbol.O,
+              playerName,
+            );
             this.gameState.status = GameStatus.PLAYING;
             window.removeEventListener("beforeunload", this.handleBeforeUnload);
             this.router.navigate(Router.Screens.GAME);
@@ -273,7 +301,7 @@ export class LobbyPage extends Page {
           );
           alertModal.open();
         }
-      }
+      },
     );
     prompt.open();
   };

@@ -28,36 +28,46 @@ export class ReplayPage extends Page {
     this.gameId = gameId;
     this.moves = details;
     if (typeof this.moves === "string") {
-      try { this.moves = JSON.parse(this.moves); } catch (e) {}
+      try {
+        this.moves = JSON.parse(this.moves);
+      } catch (e) {}
     }
-    if (this.moves && typeof this.moves === "object" && !Array.isArray(this.moves)) {
+    if (
+      this.moves &&
+      typeof this.moves === "object" &&
+      !Array.isArray(this.moves)
+    ) {
       this.moves = this.moves.list || this.moves.data || this.moves.moves || [];
     }
     try {
-      this.moves.sort((a, b) => new Date(a.datesave || a.datesaved) - new Date(b.datesave || b.datesaved));
-    } catch(e) {}
+      this.moves.sort(
+        (a, b) =>
+          new Date(a.datesave || a.datesaved) -
+          new Date(b.datesave || b.datesaved),
+      );
+    } catch (e) {}
 
     // Guess player names and symbols from moves if possible
     let player1 = null;
     let player2 = null;
-    this.moves.forEach(m => {
-        if (!player1) {
-            player1 = { name: m.playername, symbol: m.symbol };
-        } else if (player1.name !== m.playername && !player2) {
-            player2 = { name: m.playername, symbol: m.symbol };
-        }
+    this.moves.forEach((m) => {
+      if (!player1) {
+        player1 = { name: m.playername, symbol: m.symbol };
+      } else if (player1.name !== m.playername && !player2) {
+        player2 = { name: m.playername, symbol: m.symbol };
+      }
     });
 
     this.gameState.playerName = player1 ? player1.name : "Player 1";
     this.gameState.symbol = player1 ? player1.symbol : PlayerSymbol.X;
-    
+
     // We update the scoreboard once
     this.scoreBoard.update(this.gameState);
     this.scoreBoard.playerScoreDiv.style.display = "none";
     this.scoreBoard.opponentScoreDiv.style.display = "none";
-    
+
     if (player2) {
-        this.scoreBoard.opponentNameDiv.textContent = player2.name;
+      this.scoreBoard.opponentNameDiv.textContent = player2.name;
     }
   }
 
@@ -86,7 +96,7 @@ export class ReplayPage extends Page {
     this.quitButton.textContent = "Quit Replay";
     this.quitButton.style.flex = "1";
     this.quitButton.style.maxWidth = "200px";
-    
+
     this.replayAgainButton.classList.add("btn", "btn-chocolate", "hide");
     this.replayAgainButton.textContent = "Replay Again";
     this.replayAgainButton.style.flex = "1";
@@ -100,7 +110,7 @@ export class ReplayPage extends Page {
       this.scoreBoard.getHTML(),
       this.statusBar.getHTML(),
       this.gameBoard.getHTML(),
-      this.actionButtonsContainer
+      this.actionButtonsContainer,
     );
   }
 
@@ -130,7 +140,7 @@ export class ReplayPage extends Page {
     this.gameState.resetLocalBoard();
     this.updateUI();
     this.replayAgainButton.classList.add("hide");
-    
+
     this.showTurn();
 
     this.replayTimeout = setTimeout(() => this.playNextMove(), 1500);
@@ -152,7 +162,7 @@ export class ReplayPage extends Page {
       this.gameState.board[move.location] = move.symbol;
       this.gameState.evaluateGameStatus();
       this.updateUI();
-      
+
       this.currentMoveIndex++;
       this.showTurn();
 
@@ -160,12 +170,15 @@ export class ReplayPage extends Page {
     } else {
       this.gameState.evaluateGameStatus();
       if (this.gameState.status === GameStatus.GAME_OVER) {
-          const winnerName = this.gameState.winner === this.gameState.symbol ? this.gameState.playerName : this.scoreBoard.opponentNameDiv.textContent;
-          this.statusBar.gameStatusBar.textContent = `${winnerName} Won!`;
+        const winnerName =
+          this.gameState.winner === this.gameState.symbol
+            ? this.gameState.playerName
+            : this.scoreBoard.opponentNameDiv.textContent;
+        this.statusBar.gameStatusBar.textContent = `${winnerName} Won!`;
       } else if (this.gameState.status === GameStatus.DRAW) {
-          this.statusBar.gameStatusBar.textContent = "It's a draw!";
+        this.statusBar.gameStatusBar.textContent = "It's a draw!";
       } else {
-          this.statusBar.gameStatusBar.textContent = "Game ended prematurely.";
+        this.statusBar.gameStatusBar.textContent = "Game ended prematurely.";
       }
       this.replayAgainButton.classList.remove("hide");
     }
@@ -184,4 +197,3 @@ export class ReplayPage extends Page {
     }
   }
 }
-

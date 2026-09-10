@@ -6,11 +6,11 @@ export class HistoryApi extends ApiClient {
   }
 
   getAllRooms() {
-    return this.get(`/rooms`);
+    return this.get(`/room/all`);
   }
 
   getAllPlayers() {
-    return this.get(`/players`);
+    return this.get(`/player/all`);
   }
 
   getGamesByRoom(roomCode) {
@@ -33,7 +33,7 @@ export class HistoryApi extends ApiClient {
     });
   }
 
-  deletePendingGame(roomCode, gameId, options = {}) {
+  cancelPendingGame(roomCode, gameId, options = {}) {
     return this.delete(`/games/${roomCode}/pending/${gameId}`, options);
   }
 
