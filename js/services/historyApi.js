@@ -6,44 +6,44 @@ export class HistoryApi extends ApiClient {
   }
 
   getAllRooms() {
-    return this.get(`/room/all`);
+    return this.get(`/rooms`);
   }
 
   getAllPlayers() {
-    return this.get(`/player/all`);
+    return this.get(`/players`);
   }
 
   getGamesByRoom(roomCode) {
-    return this.get(`/room/${roomCode}`);
+    return this.get(`/rooms/${roomCode}`);
   }
 
   getGamesByPlayer(playerName) {
-    return this.get(`/player/${playerName}/games`);
+    return this.get(`/players/${playerName}/games`);
   }
 
   createPendingGame(body) {
-    return this.post(`/game/create`, body, {
-      headers: { "Content-Type": "application/json" }
+    return this.post(`/games/create-pending`, body, {
+      headers: { "Content-Type": "application/json" },
     });
   }
 
   joinPendingGame(body) {
-    return this.post(`/game/pending`, body, {
-      headers: { "Content-Type": "application/json" }
+    return this.post(`/games/pending`, body, {
+      headers: { "Content-Type": "application/json" },
     });
   }
 
   deletePendingGame(roomCode, gameId, options = {}) {
-    return this.delete(`/game/${roomCode}/pending/${gameId}`, options)
+    return this.delete(`/games/${roomCode}/pending/${gameId}`, options);
   }
 
   getGameDetails(gameId) {
-    return this.get(`/game/${gameId}`);
+    return this.get(`/games/${gameId}`);
   }
 
   saveMove(body) {
-    return this.post(`/game/save`, body, {
-      headers: { "Content-Type": "application/json" }
+    return this.post(`/games/save`, body, {
+      headers: { "Content-Type": "application/json" },
     });
   }
 }
